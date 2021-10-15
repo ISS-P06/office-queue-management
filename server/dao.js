@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-import db from "./db";
+import db from './db';
