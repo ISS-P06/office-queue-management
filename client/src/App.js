@@ -1,9 +1,9 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
-import {api_login, api_logout, api_getUserInfo} from './api';
-import {Row, Col, Container} from 'react-bootstrap';
-import {useState, useEffect} from 'react';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { api_login, api_logout, api_getUserInfo } from './api';
+import { Row, Col, Container } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
 
 function App() {
@@ -16,18 +16,18 @@ function App() {
       - officer
       - (empty string)
   */
-  const [userRole, setUserRole] = useState("");
+  const [userRole, setUserRole] = useState('');
   // configDone: whether the system has been configured for the first time
   const [configDone, setConfigDone] = useState(false);
 
   // useEffect used to check whether the user is logged in or not
-  useEffect(()=> {
-    const checkAuth = async() => {
+  useEffect(() => {
+    const checkAuth = async () => {
       try {
         const info = await api_getUserInfo();
         setLoggedIn(true);
         setUserRole(info.role);
-      } catch(err) {
+      } catch (err) {
         console.error(err);
       }
     };
@@ -39,135 +39,138 @@ function App() {
     try {
       await api_login(credentials);
       setLoggedIn(true);
-      return {done: true, msg: "ok"};
-    } catch(err) {
-      return {done: false, msg: err.message};
+      return { done: true, msg: 'ok' };
+    } catch (err) {
+      return { done: false, msg: err.message };
     }
-  }
+  };
 
   // method used to log out a user
   const doLogout = async () => {
     await api_logout();
     setLoggedIn(false);
-  }
+  };
 
   return (
     <Container className="App bg-dark text-dark p-0 m-0" fluid>
       <Router>
-        <AppNavbar 
-          loggedIn={loggedIn}
-          doLogout={doLogout}/>
+        <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
 
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
-            {
-              loggedIn ?
-                userRole === "admin" ?
-                  <div/>
-                  :
-                  <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <Redirect to="/home"/>
-            }
+            {loggedIn ? (
+              userRole === 'admin' ? (
+                <div />
+              ) : (
+                <DefaultUserRedirect
+                  loggedIn={loggedIn}
+                  userRole={userRole}
+                  configDone={configDone}
+                />
+              )
+            ) : (
+              <Redirect to="/home" />
+            )}
           </Route>
 
           {/* Admin-exclusive route for the configuration of counters*/}
           <Route path="/setup/counters">
-            {
-              loggedIn ?
-                userRole === "admin" ?
-                  <div/>
-                  :
-                  <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <Redirect to="/home"/>
-            }
+            {loggedIn ? (
+              userRole === 'admin' ? (
+                <div />
+              ) : (
+                <DefaultUserRedirect
+                  loggedIn={loggedIn}
+                  userRole={userRole}
+                  configDone={configDone}
+                />
+              )
+            ) : (
+              <Redirect to="/home" />
+            )}
           </Route>
 
           {/* Admin-exclusive route for resetting the configuration*/}
           <Route path="/setup">
-            {
-              loggedIn ?
-                userRole === "admin" ?
-                  <div/>
-                  :
-                  <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <Redirect to="/home"/>
-            }
+            {loggedIn ? (
+              userRole === 'admin' ? (
+                <div />
+              ) : (
+                <DefaultUserRedirect
+                  loggedIn={loggedIn}
+                  userRole={userRole}
+                  configDone={configDone}
+                />
+              )
+            ) : (
+              <Redirect to="/home" />
+            )}
           </Route>
 
           {/* Manager-exclusive route for viewing statistics*/}
           <Route path="/stats">
-            {
-              loggedIn ?
-                userRole === "manager" ?
-                  <div/>
-                  :
-                  <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <Redirect to="/home"/>
-            }
+            {loggedIn ? (
+              userRole === 'manager' ? (
+                <div />
+              ) : (
+                <DefaultUserRedirect
+                  loggedIn={loggedIn}
+                  userRole={userRole}
+                  configDone={configDone}
+                />
+              )
+            ) : (
+              <Redirect to="/home" />
+            )}
           </Route>
 
           {/* Officer-exclusive route to call in the next customer */}
           <Route path="/counter">
-            {
-              loggedIn ?
-                userRole === "officer" ?
-                  <div/>
-                  :
-                  <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <Redirect to="/home"/>
-            }
+            {loggedIn ? (
+              userRole === 'officer' ? (
+                <div />
+              ) : (
+                <DefaultUserRedirect
+                  loggedIn={loggedIn}
+                  userRole={userRole}
+                  configDone={configDone}
+                />
+              )
+            ) : (
+              <Redirect to="/home" />
+            )}
           </Route>
 
           {/* Login route */}
           <Route path="/login">
-            {
-              loggedIn ?
-                <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <div/>
-            }
+            {loggedIn ? (
+              <DefaultUserRedirect
+                loggedIn={loggedIn}
+                userRole={userRole}
+                configDone={configDone}
+              />
+            ) : (
+              <div />
+            )}
           </Route>
 
           {/* Home/customer route */}
           <Route path="/home">
-            {
-              loggedIn ?
-                <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <div/>
-            }
+            {loggedIn ? (
+              <DefaultUserRedirect
+                loggedIn={loggedIn}
+                userRole={userRole}
+                configDone={configDone}
+              />
+            ) : (
+              <div />
+            )}
           </Route>
 
           {/* Default route - redirects to /home */}
           <Route>
-            <Redirect to="/home"/>
+            <Redirect to="/home" />
           </Route>
         </Switch>
       </Router>
@@ -182,29 +185,28 @@ function DefaultUserRedirect(props) {
   const configDone = props.configDone;
 
   const renderSwitch = (role) => {
-    switch(role) {
-      case "admin":
+    switch (role) {
+      case 'admin':
         if (configDone) {
-          return <Redirect to="/setup"/>
+          return <Redirect to="/setup" />;
+        } else {
+          return <Redirect to="/setup/services" />;
         }
-        else {
-          return <Redirect to="/setup/services"/>
-        }
-      case "manager":
-        return <Redirect to="/stats"/>
-      case "officer":
-        return <Redirect to="/counter"/>
+      case 'manager':
+        return <Redirect to="/stats" />;
+      case 'officer':
+        return <Redirect to="/counter" />;
       default:
-        return <Redirect to="/home"/>
+        return <Redirect to="/home" />;
     }
-  }
+  };
 
   return (
     <div>
       loggedIn ?
-        <Redirect to="/home"/>
-        :
-        <Redirect to="/home"/>
+      <Redirect to="/home" />
+      :
+      <Redirect to="/home" />
     </div>
   );
 }
