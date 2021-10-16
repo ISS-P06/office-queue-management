@@ -5,6 +5,8 @@ import morgan from 'morgan';
 
 import { check, validationResult, checkSchema } from 'express-validator';
 
+const DAO = require("./dao.js");
+
 /* passport setup */
 import passport from 'passport';
 import session from 'express-session';
@@ -96,4 +98,16 @@ app.get('/api/sessions/current', (req, res) => {
 // activate the server
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
+});
+
+/* Node-cron setup
+   Reset the ticket at midnight, every day
+*/
+var cron = require('node-cron');
+
+cron.schedule('0 0 * * *', async () => {
+  await DAO.reset();
+}, {
+  scheduled: true,
+  timezone: "Europe/Rome"
 });
