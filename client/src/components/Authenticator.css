@@ -4,7 +4,7 @@ h2 {
 }
 
 .main {
-    padding: 10% 30%;
+    margin: 10% 30%;
     background-color: white;
 }
 
@@ -12,7 +12,7 @@ h2 {
     margin: 20px 0;
 }
 
-Form.Label { 
+Form { 
     background-color: white;
     text-align: left;
 }

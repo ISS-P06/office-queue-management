@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
-import {Form, Button} from 'react-bootstrap'
-import './Authenticator.css'
+import {Form, Button} from 'react-bootstrap';
+import './Authenticator.css';
 
 function Authenticator(props) {
     const [username, setUsername] = useState('');
@@ -11,7 +11,15 @@ function Authenticator(props) {
     const handleSubmit = () => {
         
         const credentials = { username, password };
-        props.login(credentials);
+        let valid = true;
+        
+        if(username === '' || password === '' || password.length < 6)
+            valid = false;
+      
+        if(valid) {
+            props.login(credentials);
+        }
+
 
     };
 
