@@ -5,6 +5,7 @@ import { api_login, api_logout, api_getUserInfo } from './api';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
+import NextClientWindow from './components/NextClientWindow';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -55,7 +56,7 @@ function App() {
     <Container className="App bg-dark text-dark p-0 m-0" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-
+        <NextClientWindow/>
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
@@ -129,7 +130,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <div />
+                <NextClientWindow/>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
