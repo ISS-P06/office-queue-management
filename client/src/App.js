@@ -6,9 +6,12 @@ import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
 
+import ServiceConfiguration from './components/ServiceConfiguration';
+import { api_getServices, api_addService, api_deleteService } from './api';
+
 function App() {
   // loggedIn: whether the user is logged in or not
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   // userRole: the logged-in user's role; default: empty string
   /* Possible values:
       - admin
@@ -16,7 +19,7 @@ function App() {
       - officer
       - (empty string)
   */
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState('admin');
   // configDone: whether the system has been configured for the first time
   const [configDone, setConfigDone] = useState(false);
 
@@ -51,6 +54,48 @@ function App() {
     setLoggedIn(false);
   };
 
+
+  //
+  // Service code
+  //
+
+  const [serviceList, setServiceList] = useState([]);
+  const [dirty, setDirty] = useState(true);
+  const [confStep, setConfStep] = useState(1);
+
+  useEffect(() => {
+    if(dirty){
+      api_getServices()
+        .then(services => {
+          setServiceList(services);
+          setDirty(false);
+        })
+        .catch(e => handleErrors(e));
+    }
+  }, [dirty]);
+
+  const handleErrors = (err) => {
+    console.log(err.error);
+  }
+
+  const deleteService = (service) => {
+    if(!service.status){
+      service.status = "deleted"
+      api_deleteService(service)
+        .then(() => setDirty(true) )
+        .catch(e => handleErrors(e))
+    }
+  }
+
+  const addService = (service) => {
+    service.status = "add";
+    const id = Math.max(...serviceList.map( s => s.id )) + 1;
+    setServiceList(oldList => [...oldList, { id: id, ...service }]);
+    api_addService(service)
+        .then(() => setDirty(true))
+        .catch(e => handleErrors(e));
+  }
+
   return (
     <Container className="App bg-dark text-dark p-0 m-0" fluid>
       <Router>
@@ -61,7 +106,7 @@ function App() {
           <Route path="/setup/services">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <div />
+                <ServiceConfiguration serviceList={serviceList} onNext={()=>setConfStep(2)} onDelete={deleteService} onAdd={addService}></ServiceConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
