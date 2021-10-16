@@ -10,6 +10,8 @@ import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
 
+import { listServices } from './dao';
+
 passport.use(
   new Strategy((username, password, done) => {
     // todo: userDao.getUser
@@ -63,6 +65,19 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
 
   res.status(200).json({ msg: 'hello world', num: num });
 });
+
+//
+// Service APIs
+//
+
+// GET /api/services
+app.get('/api/services', (req, res) => {
+  listServices()
+    .then(services => res.json(services))
+    .catch(() => res.status(500).end());
+});
+
+
 
 /*** Users APIs ***/
 /* login */
