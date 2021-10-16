@@ -5,6 +5,7 @@ import { api_login, api_logout, api_getUserInfo } from './api';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
+import TicketDashboard from './components/TicketDashboard';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -164,7 +165,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <div />
+              <TicketDashboard/>
             )}
           </Route>
 

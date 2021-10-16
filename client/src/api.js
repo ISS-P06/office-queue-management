@@ -31,6 +31,25 @@ const api_logout = () => {
     });
 };
 
+const api_getQueueData = async () => {
+  try {
+    const res = await axios.get('/api/getQueueData');
+    if (res.data.id) {
+      return res.data;
+    } else {
+      throw res.data.message;
+    }
+  } catch (err) {
+    if (err.response.data.message) {
+      throw new Error(err.response.data.message);
+    } else if (err.response.data.error) {
+      throw new Error(err.response.data.error);
+    } else {
+      throw new Error('Error: could not get queue data');
+    }
+  }
+};
+
 const api_getUserInfo = async () => {
   try {
     const res = await axios.get('/api/sessions/current');
@@ -50,4 +69,4 @@ const api_getUserInfo = async () => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo };
+export { api_login, api_logout, api_getUserInfo, api_getQueueData };
