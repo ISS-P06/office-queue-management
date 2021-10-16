@@ -62,7 +62,7 @@ function App() {
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
             {
-              loggedIn ?
+             loggedIn ?
                 userRole === "admin" ?
                   <div/>
                   :

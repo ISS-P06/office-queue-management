@@ -22,7 +22,7 @@ function AppNavbar(props) {
             <Col
                 className="pe-3 d-flex justify-content-end">
                 {
-                    loggedIn ? 
+                    loggedIn ?
                         <>
                             <LogoutButton
                                 doLogout = {doLogout}/>
