@@ -10,7 +10,7 @@ import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
 
-import { listServices } from './dao';
+import { listServices, createService, deleteServices, deleteService } from './dao';
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -69,6 +69,7 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
 //
 // Service APIs
 //
+// to do: authentication
 
 // GET /api/services
 app.get('/api/services', (req, res) => {
@@ -77,7 +78,59 @@ app.get('/api/services', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+// POST /api/services
+app.post('/api/services',
+  //isLoggedIn,
+  [
+    check('name').isLength({ min: 1, max: 100 }),
+    check('service_time').isFloat({ min: 0.01, max: 1440.00 }),
+  ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const service = {
+      name: req.body.name,
+      service_time: req.body.service_time,
+    };
+    try {
+      await createService(service);
+      res.status(201).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the creation of service ${service.name}.` });
+    }
+  });
 
+// DELETE /api/services/<id>
+app.delete('/api/services/:id',
+  //isLoggedIn,
+  [check('id').isInt()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      await deleteService(req.params.id);
+      res.status(200).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the deletion of service ${req.params.id}.` });
+    }
+  });
+
+// DELETE /api/services
+app.delete('/api/services',
+  //isLoggedIn,
+  async (req, res) => {
+    try {
+      await deleteServices();
+      res.status(204).end();
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the deletion of services.` });
+    }
+  });
+
+// to do: counter APIs
 
 /*** Users APIs ***/
 /* login */
