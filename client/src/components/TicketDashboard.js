@@ -1,23 +1,27 @@
-import { Row, Col, Container, Card } from 'react-bootstrap';
+import './blink.css';
+import { Row, Col, Card, Table } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
-import { api_getQueueData } from '../api';
+import { api_getQueueData} from '../api';
 
+// test data
 const services = [
-        {id: 1, name: "service 1", currentTicket: 17, update: false},
-        {id: 2, name: "service 2", currentTicket: 42, update: true},
-        {id: 3, name: "service 3", currentTicket: 66, update: false},
-        {id: 4, name: "service 4", currentTicket: 3, update: false}
+        {id: 1, name: "Service 1", currentTicket: 17, counter: 1, update: false},
+        {id: 2, name: "Service 2", currentTicket: 42, counter: 1, update: true},
+        {id: 3, name: "Service 3", currentTicket: 66, counter: 2, update: false},
+        {id: 4, name: "Service 4", currentTicket: 3, counter: 2, update: false},
+        {id: 5, name: "Service 5", currentTicket: 13, counter: 1, update: false}
     ];
 
 function TicketDashboard() {
-    const [queueData, setQueueData] = useState(services);
+    const [queueData, setQueueData] = useState([{id: -1}]);
     const [queueDataChunks, setQueueDataChunks] = useState([]);
-    let splo = 0;
 
     const getQueueData = async () => {
+        let newData = [];
         try {
-            const data = services;//await api_getQueueData();
-            let newData;
+            const data = await api_getQueueData();
+
+            let updateList = [];
 
             if (data.length == queueData.length) {
                 // if the lengths are the same, update the data contained in the 
@@ -28,7 +32,8 @@ function TicketDashboard() {
                         // if the ticket number has changed, set update to true 
                         // to make it blink
                         newData[i].currentTicket = data[i].currentTicket;
-                        newData[i].update = true;
+                        //newData[i].update = true;
+                        updateList.push(data[i].id);                        
                     }
 
                     newData[i].name = data[i].name;
@@ -38,28 +43,27 @@ function TicketDashboard() {
                 // otherwise, it means that either it's the first request for data
                 // or the number of counters has changed (i.e. the system has been reset)
                 for (let d of data) {
-                    d.update = true;
+                    //d.update = true;
+                    updateList.push(d.id);       
+                    newData.push(d);        
                 }
-                newData = data;
             }
 
             newData.sort((a, b) => {
                     return (a.id - b.id);
                 });
 
-            console.log(newData);
-
             setQueueData(newData);
         } catch(err) {
             console.error(err);
         }
-
-        splo++;
-        console.log("ao" + splo);
     };
 
     useEffect(() => {
-        setInterval(() => getQueueData(), 5000);
+        getQueueData();
+        const i = setInterval(() => getQueueData(), 10000);
+
+        return () => clearInterval(i);
     }, []);
 
     useEffect(() => {
@@ -71,38 +75,28 @@ function TicketDashboard() {
             newData.push(queueData.slice(i, i + chunkSize));
         }
 
-        console.log("ao part 2 - electric boogaloo");
-        console.log(newData);
         setQueueDataChunks(newData);
     }, [queueData]);
     
     return (
         <>
-        <Row className="text-light">
+        <Row className="text-dark">
             <h3>
                 Currently serving numbers...
             </h3>
         </Row>
        
-        <Row className='p-2' fluid>
+        <Row className='p-1' fluid>
             <Col xs={2}/>
             <Col xs={8}>
                 {
                     queueData.length <= 0 ?
-                    <Row>
+                    <Row className='text-light'>
                         No queue data found
                     </Row>
                     :
-                    queueDataChunks.map((s, i) => {
-                        console.log("spatola" + i);
-                        console.log(s);
-                        return (
-                            <TicketPanelRow
-                                key = {i}
-                                ticketDataArray = {s}
-                                />
-                        )
-                    })
+                    <QueueStatusTable
+                        queueDataArray = {queueData}/>
                 }
             </Col>
             <Col xs={2}/>
@@ -111,6 +105,57 @@ function TicketDashboard() {
     );
 }
 
+function QueueStatusTable(props) {
+    const queueDataArray = props.queueDataArray;
+
+    return (
+        <Row className="p-1 d-flex justify-content-center">
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                    <th>Service</th>
+                    <th>Ticket</th>
+                    <th>Counter</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        queueDataArray.map((q, i) => {
+                            if (q.id >= 0) {
+                                return (    
+                                    <tr>
+                                        <td>{q.name}</td>
+                                        {
+                                            q.update?
+                                            <>
+                                            <td className="blink">
+                                                {q.currentTicket}
+                                            </td>
+                                            <td className="blink">
+                                                {q.counter}
+                                            </td>
+                                            </>
+                                            : 
+                                            <>
+                                            <td>
+                                                {q.currentTicket}
+                                            </td>  
+                                            <td>{q.counter}</td>
+                                            </>
+                                        }
+                                        
+                                    </tr>
+                                )
+                            }
+                        })
+                    }
+                </tbody>
+            </Table>
+        </Row>
+    );
+}
+
+// unused component
 function TicketPanel(props) {
     /*
         ticketData contains:
@@ -120,44 +165,6 @@ function TicketPanel(props) {
         - update
     */  
     const ticketData = props.ticketData;
-    /*
-        blinkState; whether the number should be shown or not
-        true = show
-        false = don't show
-    */
-    const [blinkState, setBlinkState] = useState(true);
-    const [mustUpdate, setMustUpdate] = useState(false);
-    const [loaded, setLoaded] = useState(false);
-    let nOfBlinks = 10;
-
-    const stopBlink = () => {
-        setBlinkState(true);
-        nOfBlinks = 10;
-    }
-
-    const blinkNumber = () => {
-        setBlinkState(!blinkState);
-        nOfBlinks--;
-        
-        if (nOfBlinks <= 0) {
-            stopBlink();
-        }
-        else {
-            setTimeout(blinkNumber(), 500);
-        }
-    }
-
-    useEffect(() => {
-
-    }, );
-
-    // useEffect used to make the number blink in case of an update
-    useEffect(() => {
-        if (mustUpdate) {
-            nOfBlinks = 10;
-            blinkNumber();
-        }
-    }, [mustUpdate]);
 
     return (
         <Col xs={4}>
@@ -165,28 +172,77 @@ function TicketPanel(props) {
                 <Card.Title>
                     {ticketData.name}
                 </Card.Title>
-                <Card.Body>
-                    <h3>
-                        {blinkState? ticketData.currentTicket : ' '}
-                    </h3>
-                </Card.Body>
+                {
+                    ticketData.update === true?
+                    <Card.Body>
+                        <Row>
+                            <Col xs={6}>
+                                <Row class="text-center">
+                                    Ticket
+                                </Row>
+                                <Row className='blink'>                            
+                                    <h4>
+                                        {ticketData.currentTicket}
+                                    </h4>
+                                </Row>
+                            </Col>
+                            <Col xs={6}>
+                                <Row class="text-center">
+                                    Counter
+                                </Row>
+                                <Row>
+                                    <h4>
+                                        {ticketData.counter}
+                                    </h4>
+                                </Row>
+                            </Col>
+                        </Row>                        
+                    </Card.Body>
+                    :
+                    <Card.Body>
+                        <Row>
+                            <Col xs={6}>
+                                <Row class="text-center">
+                                    Ticket
+                                </Row>
+                                <Row>                            
+                                    <h4>
+                                        {ticketData.currentTicket}
+                                    </h4>
+                                </Row>
+                            </Col>
+                            <Col xs={6}>
+                                <Row class="text-center">
+                                    Counter
+                                </Row>
+                                <Row>
+                                    <h4>
+                                        {ticketData.counter}
+                                    </h4>
+                                </Row>
+                            </Col>
+                        </Row>  
+                    </Card.Body>
+                }
             </Card>
         </Col>
-        
     );
 }
 
+// unused component
 function TicketPanelRow(props) {
     const ticketDataArray = props.ticketDataArray;
     
     return (
-        <Row className="pt-1 pb-1">
+        <Row className="p-1 d-flex justify-content-center">
             {
                 ticketDataArray.map((t, i) => {
-                    return (
-                        <TicketPanel
-                            ticketData={t}/>
-                    );
+                    if (t.id >= 0) {
+                        return (
+                            <TicketPanel
+                                ticketData={t}/>
+                        );
+                    }
                 })
             }
         </Row>

@@ -34,19 +34,14 @@ const api_logout = () => {
 const api_getQueueData = async () => {
   try {
     const res = await axios.get('/api/getQueueData');
-    if (res.data.id) {
+    if (res.data) {
+      console.log(res.data);
       return res.data;
     } else {
-      throw res.data.message;
+      throw res.data.error;
     }
   } catch (err) {
-    if (err.response.data.message) {
-      throw new Error(err.response.data.message);
-    } else if (err.response.data.error) {
-      throw new Error(err.response.data.error);
-    } else {
-      throw new Error('Error: could not get queue data');
-    }
+    throw new Error('Error: could not get queue data');
   }
 };
 
