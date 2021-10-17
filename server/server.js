@@ -2,8 +2,10 @@
 
 import express from 'express';
 import morgan from 'morgan';
-
+import cron from 'node-cron';
 import { check, validationResult, checkSchema } from 'express-validator';
+
+import * as DAO from './dao';
 
 /* passport setup */
 import passport from 'passport';
@@ -50,6 +52,20 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+/* Node-cron setup
+   Reset the ticket at midnight, every day
+*/
+cron.schedule(
+  '0 0 * * *',
+  async () => {
+    await DAO.reset();
+  },
+  {
+    scheduled: true,
+    timezone: 'Europe/Rome',
+  }
+);
 
 /*** APIs ***/
 
