@@ -11,8 +11,8 @@ import session from 'express-session';
 import { Strategy } from 'passport-local';
 
 import { listServices, createService, deleteServices, deleteService } from './dao';
-import { listCounters, listOfferedServices, createCounter, createOfferedService } from './dao';
-import { listOfficers, createOfficer } from './dao';
+import { listCounters, listOfferedServices, createCounter, createOfferedService, deleteCounter } from './dao';
+import { listOfficers, createOfficer, deleteOfficer } from './dao';
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -168,6 +168,24 @@ app.post('/api/officers',
     }
   });
 
+
+// DELETE /api/officers/<id>
+app.delete('/api/officers/:id',
+//isLoggedIn,
+[check('id').isInt()],
+async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  try {
+    await deleteOfficer(req.params.id);
+    res.status(200).json({});
+  } catch (err) {
+    res.status(503).json({ error: `Database error during the deletion of officer ${req.params.id}.` });
+  }
+});
+
 //
 // Counter APIs
 //
@@ -233,7 +251,22 @@ app.post('/api/offered-services',
     }
   });
 
-
+// DELETE /api/counters/<id>
+app.delete('/api/counters/:id',
+  //isLoggedIn,
+  [check('id').isInt()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      await deleteCounter(req.params.id);
+      res.status(200).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the deletion of counter ${req.params.id}.` });
+    }
+  });
 
 
 

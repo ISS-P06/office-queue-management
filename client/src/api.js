@@ -186,6 +186,23 @@ const api_addOfferedService = async (os) => {
   }
 };
 
+const api_deleteCounter = async (counter) => {
+  try {
+    const res = await axios.delete('/api/counters/'+counter.id);
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 422 || err.response.status == 503) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in deleting the counter');
+    }
+  }
+};
+
 //
 // Officer API HTTP requests
 //
@@ -227,4 +244,21 @@ const api_addOfficer = async (officer) => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer, api_addCounter, api_addOfferedService };
+const api_deleteOfficer = async (officer) => {
+  try {
+    const res = await axios.delete('/api/officers/'+officer.id);
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 422 || err.response.status == 503) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in deleting the officer');
+    }
+  }
+};
+
+export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer, api_addCounter, api_addOfferedService, api_deleteCounter, api_deleteOfficer };

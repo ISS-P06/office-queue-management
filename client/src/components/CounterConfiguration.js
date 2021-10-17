@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const CounterConfiguration = (props) => {
 
-    const { serviceList, counterList, offeredServiceList, officerList, onAdd, onBack } = props;
+    const { serviceList, counterList, offeredServiceList, officerList, onAdd, onDelete, onBack } = props;
 
     return (
         <Container>
@@ -21,11 +21,11 @@ const CounterConfiguration = (props) => {
             <Row>
                 <Col md={{ span: 8, offset: 2 }}>
                     <CounterForm serviceList={serviceList} counterList={counterList} officerList={officerList} onAdd={onAdd}></CounterForm>
-                    <CounterTable counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList}></CounterTable>
+                    <CounterTable counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onDelete={onDelete}></CounterTable>
                     <Row >
                         <Col xs={{ span: 2, offset: 0 }}>
                             <Link to={'/setup/services'}>
-                                <Button className="mb-4" variant='primary'>Back</Button>
+                                <Button className="mt-2 mb-4 float-start" variant='primary'>Back</Button>
                             </Link>
                         </Col>
                         <Col xs={{ span: 2, offset: 8 }}>
@@ -53,6 +53,10 @@ const CounterForm = (props) => {
         event.stopPropagation();
         const form = event.currentTarget;
 
+        if (services.length == 0) {
+            setValidated(true);
+        }
+
         // check if form is valid using HTML constraints
         if (!form.checkValidity()) {
             setValidated(true); // enables bootstrap validation error report
@@ -69,8 +73,8 @@ const CounterForm = (props) => {
                 <h5 className="text-center mb-4">Add new counter</h5>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId='selectedScore'>
-                        <Form.Label>Services offered{services.toString()}</Form.Label>
-                        <Form.Control as="select" multiple htmlSize={serviceList.length}
+                        <Form.Label>Services offered{/*services.toString()*/}</Form.Label>
+                        <Form.Control required as="select" multiple htmlSize={serviceList.length}
                             onChange={e => setServices([].slice.call(e.target.selectedOptions).map(item => item.value))}>
                             {
                                 serviceList.map(s => {
@@ -79,7 +83,11 @@ const CounterForm = (props) => {
                                     );
                                 })
                             }
+
                         </Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                            Please provide at least one choice.
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId='form-name'>
                         <Form.Label>Officer name</Form.Label>
@@ -107,10 +115,10 @@ const CounterForm = (props) => {
 
 const CounterTable = (props) => {
 
-    const { counterList, offeredServiceList, officerList } = props;
+    const { counterList, offeredServiceList, officerList, onDelete } = props;
 
     return (<>
-        <h5 className="text-center">Existing counters</h5>
+        <h5 className="text-center mb-3">Existing counters</h5>
         <Table responsive striped bordered>
             <thead>
                 <tr>
@@ -130,10 +138,9 @@ const CounterTable = (props) => {
                                     {officerList.filter(o => o.id == c.officer).map(o => o.username)}
                                 </td>
                                 <td className="align-middle">
-                                    { offeredServiceList.filter(i => i.counter_id == c.id).map(os => os.service_name).join(", ") }
+                                    {offeredServiceList.filter(i => i.counter_id == c.id).map(os => os.service_name).join(", ")}
                                 </td>
-                                <td></td>
-                                {/*<td className="align-middle"><Button disabled={s.status} variant="danger" className="shadow-none d-inline-flex align-items-center" onClick={() => onDelete(s)}><Trash className="mb-1 mt-1"/></Button></td>*/}
+                                <td className="align-middle"><Button disabled={c.status} variant="danger" className="shadow-none d-inline-flex align-items-center" onClick={() => onDelete(c)}><Trash className="mb-1 mt-1" /></Button></td>
                             </tr>
                         );
                     })

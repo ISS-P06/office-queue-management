@@ -9,8 +9,8 @@ import AppNavbar from './components/AppNavbar';
 import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
-import { api_getCounters, api_getOfferedServices } from './api';
-import { api_getOfficers, api_addOfficer } from './api';
+import { api_getCounters, api_getOfferedServices, api_deleteCounter } from './api';
+import { api_getOfficers, api_addOfficer, api_deleteOfficer } from './api';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -59,7 +59,7 @@ function App() {
 
 
   //
-  // Service code
+  // Configuration code
   //
 
   const [serviceList, setServiceList] = useState([]);
@@ -139,7 +139,7 @@ function App() {
     if(officerList.length == 0){
       oid = 1;
     }
-    setOfficerList(oldList => [...oldList, { id: oid, ...officer }]);
+    setOfficerList(oldList => [...oldList, { id: oid, ...officer.username }]);
     api_addOfficer(officer)
         .then(() => {
 
@@ -150,9 +150,10 @@ function App() {
           setCounterList(oldList => [...oldList, { id: cid, officer: oid }]);
           api_addCounter({ id: cid, officer: oid })
           .then(() => {
-            console.log("HELLOOOOO");
             for(let i = 0; i < services.length; i++){
               let newService = Object.assign({}, { cid: cid, sid: services[i] });
+              let serviceName = serviceList.filter(s => s.id == services[i]).map(s => s.name);
+              setOfferedServiceList(oldList => [...oldList, { counter_id: cid, service_id: services[i], service_name: serviceName }]);
               api_addOfferedService(newService)
               .then(() => {
                 setDirty(true);
@@ -167,6 +168,22 @@ function App() {
         .catch(e => handleErrors(e));
   }
 
+  const deleteCounter = (counter) => {
+    if(!counter.status){
+      counter.status = "deleted"
+      api_deleteCounter(counter)
+        .then(() => {
+
+            api_deleteOfficer({id: counter.officer})
+              .then(() => {
+                setDirty(true);
+              })
+              .catch(e => handleErrors(e))
+        
+        })
+        .catch(e => handleErrors(e))
+    }
+  }
 
   return (
     <Container className="App p-0 m-0" fluid>
@@ -195,7 +212,7 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onAdd={addCounter} onBack={()=>setConfStep(1)}></CounterConfiguration>
+                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onAdd={addCounter} onDelete={deleteCounter} onBack={()=>setConfStep(1)}></CounterConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}

@@ -125,6 +125,29 @@ export function createOfferedService(os) {
     });
 };
 
+// delete all data related to a counter
+export function deleteCounter(id) {
+    return new Promise((resolve, reject) => {
+        const sql1 = 'DELETE FROM Service WHERE ref_counter = ?';
+        db.run(sql1, [id], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else {
+                const sql2 = 'DELETE FROM Counter WHERE id = ?;';
+                db.run(sql2, [id], (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    } else {
+                        resolve(null);
+                    }   
+                });
+            }   
+        });
+    });
+}
+
 //
 // Officer queries
 //
@@ -157,3 +180,17 @@ export function createOfficer(o) {
         });
     });
 };
+
+// delete a single officer
+export function deleteOfficer(id) {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM Employee WHERE id = ?';
+        db.run(sql, [id], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else
+                resolve(null);
+        });
+    });
+}

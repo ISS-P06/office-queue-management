@@ -25,7 +25,7 @@ const ServiceConfiguration = (props) => {
                     <Row >
                         <Col xs={{ span: 2, offset: 0 }}>
                             {/*<Link to={'/home'}>
-                                <Button className="mb-4" variant='primary'>Exit</Button>
+                                <Button className="mb-4 float-start" variant='primary'>Exit</Button>
                             </Link>*/}
                         </Col>
                         <Col xs={{ span: 2, offset: 8 }} >
