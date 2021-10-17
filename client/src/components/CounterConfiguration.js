@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const CounterConfiguration = (props) => {
 
-    const { serviceList, counterList, offeredServiceList, officerList, onBack } = props;
+    const { serviceList, counterList, offeredServiceList, officerList, onAdd, onBack } = props;
 
     return (
         <Container>
@@ -20,7 +20,7 @@ const CounterConfiguration = (props) => {
             </Row>
             <Row>
                 <Col md={{ span: 8, offset: 2 }}>
-                    <CounterForm serviceList={serviceList}></CounterForm>
+                    <CounterForm serviceList={serviceList} onAdd={onAdd}></CounterForm>
                     <CounterTable counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList}></CounterTable>
                     <Row >
                         <Col xs={{ span: 2, offset: 0 }}>
@@ -41,13 +41,32 @@ const CounterConfiguration = (props) => {
 }
 
 const CounterForm = (props) => {
-    const { serviceList } = props;
+    const { serviceList, onAdd } = props;
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [validated, setValidated] = useState(false);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const form = event.currentTarget;
+
+        // check if form is valid using HTML constraints
+        if (!form.checkValidity()) {
+            setValidated(true); // enables bootstrap validation error report
+        } else {
+            // we must re-compose the service object from its separated fields
+            const newOfficer = Object.assign({}, { username, password });
+            onAdd(newOfficer);
+        }
+    }
 
     return (
         <Row>
             <Col xs={{ span: 6, offset: 3 }}>
                 <h5 className="text-center mb-4">Add new counter</h5>
-                <Form>
+                <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId='selectedScore'>
                         <Form.Label>Services offered</Form.Label>
                         <Form.Control as="select" multiple htmlSize={serviceList.length}>
@@ -60,16 +79,24 @@ const CounterForm = (props) => {
                             }
                         </Form.Control>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId='selectedCourse'>
-                        <Form.Label>Officier name</Form.Label>
-                        <Form.Control type="text" />
+                    <Form.Group className="mb-3" controlId='form-name'>
+                        <Form.Label>Officer name</Form.Label>
+                        <Form.Control type="text" name="username" placeholder="Enter officer name" value={username}
+                            onChange={(ev) => setUsername(ev.target.value)} required autoFocus />
+                        <Form.Control.Feedback type="invalid">
+                            Please provide a officer name.
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-4" controlId='selectedCourse'>
                         <Form.Label>Officier password</Form.Label>
-                        <Form.Control type="text" />
+                        <Form.Control type="password" name="password" value={password}
+                            onChange={(ev) => setPassword(ev.target.value)} required autoFocus />
+                        <Form.Control.Feedback type="invalid">
+                            Please provide a valid password.
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Col md={{ span: 1, offset: 5 }}>
-                        <Button className="mb-5" variant='success'>Add</Button>
+                        <Button className="mb-5" variant='success' type='submit'>Add</Button>
                     </Col>
                 </Form></Col>
         </Row>

@@ -12,7 +12,7 @@ import { Strategy } from 'passport-local';
 
 import { listServices, createService, deleteServices, deleteService } from './dao';
 import { listCounters, listOfferedServices } from './dao';
-import { listOfficers } from './dao';
+import { listOfficers, createOfficer } from './dao';
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -144,6 +144,30 @@ app.get('/api/officers', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+// POST /api/officers
+app.post('/api/officers',
+  //isLoggedIn,
+  [
+    check('username').isLength({ min: 1, max: 100 }),
+    check('password').isLength({ min: 8, max: 20 }),
+  ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const officer = {
+      username: req.body.username,
+      password: req.body.password,
+      role: "officer"
+    };
+    try {
+      await createOfficer(officer);
+      res.status(201).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the creation of officer ${officer.username}.` });
+    }
+  });
+
 //
 // Counter APIs
 //
@@ -162,6 +186,7 @@ app.get('/api/offered-services', (req, res) => {
     .then(services => res.json(services))
     .catch(() => res.status(500).end());
 });
+
 
 
 

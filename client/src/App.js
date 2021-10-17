@@ -10,7 +10,7 @@ import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
 import { api_getCounters, api_getOfferedServices } from './api';
-import { api_getOfficers } from './api';
+import { api_getOfficers, api_addOfficer } from './api';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -133,6 +133,15 @@ function App() {
         .catch(e => handleErrors(e));
   }
 
+  const addCounter = (officer) => {
+    officer.status = "add";
+    const id = Math.max(...officerList.map( o => o.id )) + 1;
+    setOfficerList(oldList => [...oldList, { id: id, ...officer }]);
+    api_addOfficer(officer)
+        .then(() => setDirty(true))
+        .catch(e => handleErrors(e));
+  }
+
 
   return (
     <Container className="App p-0 m-0" fluid>
@@ -161,7 +170,7 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onBack={()=>setConfStep(1)}></CounterConfiguration>
+                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onAdd={addCounter} onBack={()=>setConfStep(1)}></CounterConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}

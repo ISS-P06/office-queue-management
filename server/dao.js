@@ -115,3 +115,17 @@ export function listOfficers() {
         });
     });
 };
+
+// add a new officer
+export function createOfficer(o) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO Employee(username, password, role) VALUES(?, ?, ?)';
+        db.run(sql, [o.username, o.password, o.role], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+};

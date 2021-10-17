@@ -167,4 +167,24 @@ const api_getOfficers = async () => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers };
+const api_addOfficer = async (officer) => {
+  try {
+    const res = await axios.post('/api/officers', {
+        username: officer.username,
+        password: officer.password,
+    });
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 422 || err.response.status == 503) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in adding the new officer');
+    }
+  }
+};
+
+export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer };
