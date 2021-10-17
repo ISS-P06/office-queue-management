@@ -20,7 +20,7 @@ const CounterConfiguration = (props) => {
             </Row>
             <Row>
                 <Col md={{ span: 8, offset: 2 }}>
-                    <CounterForm serviceList={serviceList} onAdd={onAdd}></CounterForm>
+                    <CounterForm serviceList={serviceList} counterList={counterList} officerList={officerList} onAdd={onAdd}></CounterForm>
                     <CounterTable counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList}></CounterTable>
                     <Row >
                         <Col xs={{ span: 2, offset: 0 }}>
@@ -41,8 +41,9 @@ const CounterConfiguration = (props) => {
 }
 
 const CounterForm = (props) => {
-    const { serviceList, onAdd } = props;
+    const { serviceList, counterList, officerList, onAdd } = props;
 
+    const [services, setServices] = useState([]);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [validated, setValidated] = useState(false);
@@ -58,7 +59,7 @@ const CounterForm = (props) => {
         } else {
             // we must re-compose the service object from its separated fields
             const newOfficer = Object.assign({}, { username, password });
-            onAdd(newOfficer);
+            onAdd(newOfficer, services);
         }
     }
 
@@ -68,8 +69,9 @@ const CounterForm = (props) => {
                 <h5 className="text-center mb-4">Add new counter</h5>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Form.Group className="mb-3" controlId='selectedScore'>
-                        <Form.Label>Services offered</Form.Label>
-                        <Form.Control as="select" multiple htmlSize={serviceList.length}>
+                        <Form.Label>Services offered{services.toString()}</Form.Label>
+                        <Form.Control as="select" multiple htmlSize={serviceList.length}
+                            onChange={e => setServices([].slice.call(e.target.selectedOptions).map(item => item.value))}>
                             {
                                 serviceList.map(s => {
                                     return (

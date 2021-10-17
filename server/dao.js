@@ -97,6 +97,34 @@ export function listOfferedServices() {
     });
 };
 
+// add a new counter
+export function createCounter(c) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO Counter(id, ref_officer) VALUES(?, ?)';
+        db.run(sql, [c.id, c.officer], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+};
+
+// add a new offered service
+export function createOfferedService(os) {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO Service(ref_counter, ref_service_type) VALUES(?, ?)';
+        db.run(sql, [os.cid, os.sid], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+};
+
 //
 // Officer queries
 //

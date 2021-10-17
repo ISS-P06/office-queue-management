@@ -146,6 +146,46 @@ const api_getOfferedServices = async () => {
   }
 };
 
+const api_addCounter = async (counter) => {
+  try {
+    const res = await axios.post('/api/counters', {
+        id: counter.id,
+        officer: counter.officer,
+    });
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 422 || err.response.status == 503) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in adding the new counter');
+    }
+  }
+};
+
+const api_addOfferedService = async (os) => {
+  try {
+    const res = await axios.post('/api/offered-services', {
+        cid: os.cid,
+        sid: os.sid,
+    });
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 422 || err.response.status == 503) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in adding the new offered service');
+    }
+  }
+};
+
 //
 // Officer API HTTP requests
 //
@@ -187,4 +227,4 @@ const api_addOfficer = async (officer) => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer };
+export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer, api_addCounter, api_addOfferedService };

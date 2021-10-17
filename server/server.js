@@ -11,7 +11,7 @@ import session from 'express-session';
 import { Strategy } from 'passport-local';
 
 import { listServices, createService, deleteServices, deleteService } from './dao';
-import { listCounters, listOfferedServices } from './dao';
+import { listCounters, listOfferedServices, createCounter, createOfferedService } from './dao';
 import { listOfficers, createOfficer } from './dao';
 
 passport.use(
@@ -187,7 +187,51 @@ app.get('/api/offered-services', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
+// POST /api/counters
+app.post('/api/counters',
+  //isLoggedIn,
+  [
+    check('id').isInt(),
+    check('officer').isInt(),
+  ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const c = {
+      id: req.body.id,
+      officer: req.body.officer,
+    };
+    try {
+      await createCounter(c);
+      res.status(201).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the creation of the counter` });
+    }
+  });
 
+// POST /api/offered-services
+app.post('/api/offered-services',
+  //isLoggedIn,
+  [
+    check('cid').isInt(),
+    check('sid').isInt(),
+  ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    const os = {
+      cid: req.body.cid,
+      sid: req.body.sid,
+    };
+    try {
+      await createOfferedService(os);
+      res.status(201).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the creation of the offered service` });
+    }
+  });
 
 
 

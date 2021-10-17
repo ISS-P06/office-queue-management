@@ -1,7 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import { api_login, api_logout, api_getUserInfo } from './api';
+import { api_login, api_logout, api_getUserInfo, api_addCounter, api_addOfferedService } from './api';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
@@ -133,12 +133,37 @@ function App() {
         .catch(e => handleErrors(e));
   }
 
-  const addCounter = (officer) => {
+  const addCounter = (officer, services) => {
     officer.status = "add";
-    const id = Math.max(...officerList.map( o => o.id )) + 1;
-    setOfficerList(oldList => [...oldList, { id: id, ...officer }]);
+    let oid = Math.max(...officerList.map( o => o.id )) + 1;
+    if(officerList.length == 0){
+      oid = 1;
+    }
+    setOfficerList(oldList => [...oldList, { id: oid, ...officer }]);
     api_addOfficer(officer)
-        .then(() => setDirty(true))
+        .then(() => {
+
+          let cid = Math.max(...counterList.map( c => c.id )) + 1;
+          if(counterList.length == 0){
+            cid = 1;
+          }
+          setCounterList(oldList => [...oldList, { id: cid, officer: oid }]);
+          api_addCounter({ id: cid, officer: oid })
+          .then(() => {
+            console.log("HELLOOOOO");
+            for(let i = 0; i < services.length; i++){
+              let newService = Object.assign({}, { cid: cid, sid: services[i] });
+              api_addOfferedService(newService)
+              .then(() => {
+                setDirty(true);
+              })
+              .catch(e => handleErrors(e));
+            }
+
+          })
+          .catch(e => handleErrors(e));
+
+        })
         .catch(e => handleErrors(e));
   }
 
