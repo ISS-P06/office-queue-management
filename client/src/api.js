@@ -74,8 +74,8 @@ const api_getServices = async () => {
 const api_addService = async (service) => {
   try {
     const res = await axios.post('/api/services', {
-        name: service.name,
-        service_time: service.service_time,
+      name: service.name,
+      service_time: service.service_time,
     });
     if (res.data) {
       return res.data;
@@ -93,7 +93,7 @@ const api_addService = async (service) => {
 
 const api_deleteService = async (service) => {
   try {
-    const res = await axios.delete('/api/services/'+service.id);
+    const res = await axios.delete('/api/services/' + service.id);
     if (res.data) {
       return res.data;
     } else {
@@ -149,8 +149,8 @@ const api_getOfferedServices = async () => {
 const api_addCounter = async (counter) => {
   try {
     const res = await axios.post('/api/counters', {
-        id: counter.id,
-        officer: counter.officer,
+      id: counter.id,
+      officer: counter.officer,
     });
     if (res.data) {
       return res.data;
@@ -169,8 +169,8 @@ const api_addCounter = async (counter) => {
 const api_addOfferedService = async (os) => {
   try {
     const res = await axios.post('/api/offered-services', {
-        cid: os.cid,
-        sid: os.sid,
+      cid: os.cid,
+      sid: os.sid,
     });
     if (res.data) {
       return res.data;
@@ -188,7 +188,7 @@ const api_addOfferedService = async (os) => {
 
 const api_deleteCounter = async (counter) => {
   try {
-    const res = await axios.delete('/api/counters/'+counter.id);
+    const res = await axios.delete('/api/counters/' + counter.id);
     if (res.data) {
       return res.data;
     } else {
@@ -227,8 +227,8 @@ const api_getOfficers = async () => {
 const api_addOfficer = async (officer) => {
   try {
     const res = await axios.post('/api/officers', {
-        username: officer.username,
-        password: officer.password,
+      username: officer.username,
+      password: officer.password,
     });
     if (res.data) {
       return res.data;
@@ -246,7 +246,7 @@ const api_addOfficer = async (officer) => {
 
 const api_deleteOfficer = async (officer) => {
   try {
-    const res = await axios.delete('/api/officers/'+officer.id);
+    const res = await axios.delete('/api/officers/' + officer.id);
     if (res.data) {
       return res.data;
     } else {

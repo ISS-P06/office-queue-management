@@ -171,20 +171,20 @@ app.post('/api/officers',
 
 // DELETE /api/officers/<id>
 app.delete('/api/officers/:id',
-//isLoggedIn,
-[check('id').isInt()],
-async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
-  try {
-    await deleteOfficer(req.params.id);
-    res.status(200).json({});
-  } catch (err) {
-    res.status(503).json({ error: `Database error during the deletion of officer ${req.params.id}.` });
-  }
-});
+  //isLoggedIn,
+  [check('id').isInt()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    try {
+      await deleteOfficer(req.params.id);
+      res.status(200).json({});
+    } catch (err) {
+      res.status(503).json({ error: `Database error during the deletion of officer ${req.params.id}.` });
+    }
+  });
 
 //
 // Counter APIs

@@ -141,9 +141,9 @@ export function deleteCounter(id) {
                         return;
                     } else {
                         resolve(null);
-                    }   
+                    }
                 });
-            }   
+            }
         });
     });
 }

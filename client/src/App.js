@@ -77,20 +77,20 @@ function App() {
 
   const callGetServices = () => {
     api_getServices()
-    .then(services => {
-      setServiceList(services);
-      callGetCounters();
-    })
-    .catch(e => handleErrors(e));
+      .then(services => {
+        setServiceList(services);
+        callGetCounters();
+      })
+      .catch(e => handleErrors(e));
   }
 
   const callGetCounters = () => {
     api_getCounters()
-    .then(counters => {
-      setCounterList(counters);
-      callGetOfferedServices();
-    })
-    .catch(e => handleErrors(e));
+      .then(counters => {
+        setCounterList(counters);
+        callGetOfferedServices();
+      })
+      .catch(e => handleErrors(e));
   }
 
   const callGetOfferedServices = () => {
@@ -116,70 +116,70 @@ function App() {
   }
 
   const deleteService = (service) => {
-    if(!service.status){
+    if (!service.status) {
       service.status = "deleted"
       api_deleteService(service)
-        .then(() => setDirty(true) )
+        .then(() => setDirty(true))
         .catch(e => handleErrors(e))
     }
   }
 
   const addService = (service) => {
     service.status = "add";
-    const id = Math.max(...serviceList.map( s => s.id )) + 1;
+    const id = Math.max(...serviceList.map(s => s.id)) + 1;
     setServiceList(oldList => [...oldList, { id: id, ...service }]);
     api_addService(service)
-        .then(() => setDirty(true))
-        .catch(e => handleErrors(e));
+      .then(() => setDirty(true))
+      .catch(e => handleErrors(e));
   }
 
   const addCounter = (officer, services) => {
     officer.status = "add";
-    let oid = Math.max(...officerList.map( o => o.id )) + 1;
-    if(officerList.length == 0){
+    let oid = Math.max(...officerList.map(o => o.id)) + 1;
+    if (officerList.length == 0) {
       oid = 1;
     }
-    setOfficerList(oldList => [...oldList, { id: oid, ...officer.username }]);
+    //setOfficerList(oldList => [...oldList, { id: oid, ...officer.username }]);
     api_addOfficer(officer)
-        .then(() => {
+      .then(() => {
 
-          let cid = Math.max(...counterList.map( c => c.id )) + 1;
-          if(counterList.length == 0){
-            cid = 1;
-          }
-          setCounterList(oldList => [...oldList, { id: cid, officer: oid }]);
-          api_addCounter({ id: cid, officer: oid })
+        let cid = Math.max(...counterList.map(c => c.id)) + 1;
+        if (counterList.length == 0) {
+          cid = 1;
+        }
+        //setCounterList(oldList => [...oldList, { id: cid, officer: oid }]);
+        api_addCounter({ id: cid, officer: oid })
           .then(() => {
-            for(let i = 0; i < services.length; i++){
+            for (let i = 0; i < services.length; i++) {
               let newService = Object.assign({}, { cid: cid, sid: services[i] });
               let serviceName = serviceList.filter(s => s.id == services[i]).map(s => s.name);
-              setOfferedServiceList(oldList => [...oldList, { counter_id: cid, service_id: services[i], service_name: serviceName }]);
+              //setOfferedServiceList(oldList => [...oldList, { counter_id: cid, service_id: services[i], service_name: serviceName }]);
               api_addOfferedService(newService)
-              .then(() => {
-                setDirty(true);
-              })
-              .catch(e => handleErrors(e));
+                .then(() => {
+                  setDirty(true);
+                })
+                .catch(e => handleErrors(e));
             }
 
           })
           .catch(e => handleErrors(e));
 
-        })
-        .catch(e => handleErrors(e));
+      })
+      .catch(e => handleErrors(e));
   }
 
   const deleteCounter = (counter) => {
-    if(!counter.status){
+    if (!counter.status) {
       counter.status = "deleted"
       api_deleteCounter(counter)
         .then(() => {
 
-            api_deleteOfficer({id: counter.officer})
-              .then(() => {
-                setDirty(true);
-              })
-              .catch(e => handleErrors(e))
-        
+          api_deleteOfficer({ id: counter.officer })
+            .then(() => {
+              setDirty(true);
+            })
+            .catch(e => handleErrors(e))
+
         })
         .catch(e => handleErrors(e))
     }
@@ -195,7 +195,7 @@ function App() {
           <Route path="/setup/services">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <ServiceConfiguration serviceList={serviceList} onNext={()=>setConfStep(2)} onDelete={deleteService} onAdd={addService}></ServiceConfiguration>
+                <ServiceConfiguration serviceList={serviceList} onNext={() => setConfStep(2)} onDelete={deleteService} onAdd={addService}></ServiceConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -212,7 +212,7 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onAdd={addCounter} onDelete={deleteCounter} onBack={()=>setConfStep(1)}></CounterConfiguration>
+                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onAdd={addCounter} onDelete={deleteCounter} onBack={() => setConfStep(1)}></CounterConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
