@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
 
 import ServiceConfiguration from './components/ServiceConfiguration';
+import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
 
 function App() {
@@ -97,7 +98,7 @@ function App() {
   }
 
   return (
-    <Container className="App bg-dark text-dark p-0 m-0" fluid>
+    <Container className="App bg-dark text-light p-0 m-0" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
 
@@ -123,7 +124,7 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <div />
+                <CounterConfiguration serviceList={serviceList} onBack={()=>setConfStep(1)}></CounterConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
