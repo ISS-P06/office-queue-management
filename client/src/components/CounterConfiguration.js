@@ -1,10 +1,11 @@
 import { Container, Row, Col, Table, Button, Form } from 'react-bootstrap';
 
+
 const CounterConfiguration = (props) => {
 
     const { serviceList, onBack } = props;
 
-    return (<>
+    return (<Container>
         <Row>
             <Col md={{ span: 8, offset: 2 }}>
                 <Row className="align-items-center">
@@ -28,7 +29,7 @@ const CounterConfiguration = (props) => {
                     </Col>
                 </Row>
             </Col></Row>
-    </>
+    </Container>
     );
 }
 
