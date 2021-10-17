@@ -80,6 +80,12 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
   res.status(200).json({ msg: 'hello world', num: num });
 });
 
+/*** Officers APIs ***/
+/* Used to call the next client */
+app.post('/api/officer/callNextClient', function (req, res, next) {
+  console.log('backend');
+});
+
 /*** Users APIs ***/
 /* login */
 app.post('/api/sessions', function (req, res, next) {
@@ -108,13 +114,6 @@ app.get('/api/sessions/current', (req, res) => {
     res.status(200).json(req.user);
   } else res.status(401).json({ error: 'Unauthenticated user!' });
 });
-
-/*** Officer APIs ***/
-/* Used to call the next client */
-app.post('/api/officer/callNextClient', function (req, res, next) {
-  console.log("backend");
-});
-
 
 // activate the server
 app.listen(port, () => {

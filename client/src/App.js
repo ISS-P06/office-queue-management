@@ -57,7 +57,7 @@ function App() {
     <Container className="App text-dark p-0 m-0" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-        <NextClientWindow/>
+        <NextClientWindow />
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
@@ -131,7 +131,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <NextClientWindow/>
+                <NextClientWindow />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -153,7 +153,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <Authenticator login={doLogin}/>
+              <Authenticator login={doLogin} />
             )}
           </Route>
 
