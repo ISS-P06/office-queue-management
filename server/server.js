@@ -11,6 +11,8 @@ import session from 'express-session';
 import { Strategy } from 'passport-local';
 
 import { listServices, createService, deleteServices, deleteService } from './dao';
+import { listCounters, listOfferedServices } from './dao';
+import { listOfficers } from './dao';
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -130,7 +132,41 @@ app.delete('/api/services',
     }
   });
 
-// to do: counter APIs
+//
+// Officer APIs
+//
+// to do: authentication
+
+// GET /api/officers
+app.get('/api/officers', (req, res) => {
+  listOfficers()
+    .then(officers => res.json(officers))
+    .catch(() => res.status(500).end());
+});
+
+//
+// Counter APIs
+//
+// to do: authentication
+
+// GET /api/counters
+app.get('/api/counters', (req, res) => {
+  listCounters()
+    .then(counters => res.json(counters))
+    .catch(() => res.status(500).end());
+});
+
+// GET /api/offered-services
+app.get('/api/offered-services', (req, res) => {
+  listOfferedServices()
+    .then(services => res.json(services))
+    .catch(() => res.status(500).end());
+});
+
+
+
+
+
 
 /*** Users APIs ***/
 /* login */

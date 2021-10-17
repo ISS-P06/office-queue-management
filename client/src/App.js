@@ -9,6 +9,8 @@ import AppNavbar from './components/AppNavbar';
 import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
+import { api_getCounters, api_getOfferedServices } from './api';
+import { api_getOfficers } from './api';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -61,19 +63,53 @@ function App() {
   //
 
   const [serviceList, setServiceList] = useState([]);
+  const [counterList, setCounterList] = useState([]);
+  const [officerList, setOfficerList] = useState([]);
+  const [offeredServiceList, setOfferedServiceList] = useState([]);
   const [dirty, setDirty] = useState(true);
   const [confStep, setConfStep] = useState(1);
 
   useEffect(() => {
-    if(dirty){
-      api_getServices()
-        .then(services => {
-          setServiceList(services);
-          setDirty(false);
-        })
-        .catch(e => handleErrors(e));
+    if (dirty) {
+      callGetServices();
     }
   }, [dirty]);
+
+  const callGetServices = () => {
+    api_getServices()
+    .then(services => {
+      setServiceList(services);
+      callGetCounters();
+    })
+    .catch(e => handleErrors(e));
+  }
+
+  const callGetCounters = () => {
+    api_getCounters()
+    .then(counters => {
+      setCounterList(counters);
+      callGetOfferedServices();
+    })
+    .catch(e => handleErrors(e));
+  }
+
+  const callGetOfferedServices = () => {
+    api_getOfferedServices()
+      .then(os => {
+        setOfferedServiceList(os);
+        callGetOfficers();
+      })
+      .catch(e => handleErrors(e));
+  }
+
+  const callGetOfficers = () => {
+    api_getOfficers()
+      .then(o => {
+        setOfficerList(o);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
+  }
 
   const handleErrors = (err) => {
     console.log(err.error);
@@ -96,6 +132,7 @@ function App() {
         .then(() => setDirty(true))
         .catch(e => handleErrors(e));
   }
+
 
   return (
     <Container className="App p-0 m-0" fluid>
@@ -124,7 +161,7 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <CounterConfiguration serviceList={serviceList} onBack={()=>setConfStep(1)}></CounterConfiguration>
+                <CounterConfiguration serviceList={serviceList} counterList={counterList} offeredServiceList={offeredServiceList} officerList={officerList} onBack={()=>setConfStep(1)}></CounterConfiguration>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}

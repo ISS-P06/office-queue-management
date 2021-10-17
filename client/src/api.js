@@ -108,4 +108,63 @@ const api_deleteService = async (service) => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService };
+//
+// Counter API HTTP requests
+//
+
+const api_getCounters = async () => {
+  try {
+    const res = await axios.get('/api/counters');
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 500) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in getting all the counters');
+    }
+  }
+};
+
+const api_getOfferedServices = async () => {
+  try {
+    const res = await axios.get('/api/offered-services');
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 500) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in getting all the offered services');
+    }
+  }
+};
+
+//
+// Officer API HTTP requests
+//
+
+const api_getOfficers = async () => {
+  try {
+    const res = await axios.get('/api/officers');
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error(res.data.message);
+    }
+  } catch (err) {
+    if (err.response.status == 500) {
+      throw new Error(err.response.data);
+    } else {
+      throw new Error('Sorry, there was an error in getting all the officers');
+    }
+  }
+};
+
+export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers };

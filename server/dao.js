@@ -62,3 +62,56 @@ export function deleteService(id) {
         });
     });
 }
+
+//
+// Counter queries
+//
+
+// get all counters
+export function listCounters() {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM Counter';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const counters = rows.map((c) => ({ id: c.id, officer: c.ref_officer }));
+            resolve(counters);
+        });
+    });
+};
+
+// get all the offered services for each counter
+export function listOfferedServices() {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT ref_counter, id, name FROM Service s, Service_Type st WHERE s.ref_service_type = st.id';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const offered_services = rows.map((os) => ({ counter_id: os.ref_counter, service_id: os.id, service_name: os.name }));
+            resolve(offered_services);
+        });
+    });
+};
+
+//
+// Officer queries
+//
+
+// get all officers
+export function listOfficers() {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT id, username FROM Employee WHERE role="officer"';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const officers = rows.map((o) => ({ id: o.id, username: o.username }));
+            resolve(officers);
+        });
+    });
+};

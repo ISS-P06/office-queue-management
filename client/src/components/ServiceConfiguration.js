@@ -108,7 +108,7 @@ const ServiceTable = (props) => {
                 {
                     serviceList.map(s => {
                         return (
-                            <tr>
+                            <tr key={s.id}>
                                 <td className="align-middle">{s.name}</td>
                                 <td className="align-middle">{s.service_time}</td>
                                 <td className="align-middle"><Button disabled={s.status} variant="danger" className="shadow-none d-inline-flex align-items-center" onClick={() => onDelete(s)}><Trash className="mb-1 mt-1"/></Button>
