@@ -3,8 +3,10 @@
 import express from 'express';
 import morgan from 'morgan';
 import cron from 'node-cron';
+
 import { check, validationResult, checkSchema } from 'express-validator';
 
+import { getServices, insertNewTicket } from './dao';
 import * as DAO from './dao';
 
 /* passport setup */
@@ -60,7 +62,6 @@ app.use(
     cookie: { sameSite: 'strict' },
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -89,6 +90,61 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
   const num = req.params.num;
 
   res.status(200).json({ msg: 'hello world', num: num });
+});
+
+/*** Officers APIs ***/
+/* Used to call the next client */
+app.post(
+  '/api/officers/callNextClient',
+  // TODO add isLoggedIn check
+  [check('idCounter').isInt()],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
+
+    const { idCounter, idTicketServed } = req.body;
+
+    try {
+      const id = await DAO.callNextClient(idCounter, idTicketServed);
+      console.log(id);
+      res.status(200).json(id);
+    } catch (e) {
+      // console.log(e);
+      res.status(503).json({ error: 'Error in calling the next client' });
+    }
+  }
+);
+
+// Route used to get the current queue status
+app.get('/api/getQueueData', (req, res) => {
+  getQueueStatus()
+    .then((queueStatus) => res.json(queueStatus))
+    .catch(() => res.status(500).end());
+});
+
+// get the services and their types
+app.get('/api/get_service_types', (req, res) => {
+  getServices()
+    .then((services) => {
+      return res.json(services);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+//insert the selected ticket
+app.post('/api/insert-selected-ticket', async (req, res) => {
+  let serviceID = req.body.serviceID;
+  try {
+    await insertNewTicket(serviceID);
+    res.end();
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 //

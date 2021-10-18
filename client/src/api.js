@@ -281,6 +281,23 @@ export const api_callNextClient = async (idCounter, idTicketServed) => {
   }
 };
 
+export const apiGetServices = async () =>
+  fetch('/api/get_service_types')
+    .then((response) => response.json())
+    .catch((err) => {
+      console.log('ERROR', err);
+    });
+
+export const apiInsertTicket = async (serviceID) => {
+  await fetch('api/insert-selected-ticket', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ serviceID: serviceID }),
+  });
+};
+
 export const api_getQueueData = async () => {
   try {
     const res = await axios.get('/api/getQueueData');
