@@ -12,7 +12,7 @@ export function getQueueStatus() {
                 AND ST.id = S.ref_service_type
                 AND S.ref_counter = C.id
                 AND T.status = 'not served'
-            GROUP BY ST.id, ST.name, C.number;`;
+            GROUP BY ST.id, ST.name;`;
         db.all(sql, [], (err, rows) => {
           if (err) {
             console.log(err);
