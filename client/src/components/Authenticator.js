@@ -64,8 +64,7 @@ function Authenticator(props) {
                 Login</Button>
         </Form>
         </div>
-    );
-
+  );
 }
 
 export default Authenticator;

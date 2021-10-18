@@ -1,11 +1,33 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import { api_login, api_logout, api_getUserInfo } from './api';
+import {
+  api_login,
+  api_logout,
+  api_getUserInfo,
+  api_addCounter,
+  api_addOfferedService,
+} from './api';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
+
+import ServiceConfiguration from './components/ServiceConfiguration';
+import CounterConfiguration from './components/CounterConfiguration';
+import { api_getServices, api_addService, api_deleteService } from './api';
+import { api_getCounters, api_getOfferedServices, api_deleteCounter } from './api';
+import {
+  api_getOfficers,
+  api_addOfficer,
+  api_deleteOfficer,
+  apiGetServices,
+  apiInsertTicket,
+} from './api';
+
 import AppNavbar from './components/AppNavbar';
+import ServiceSelector from './components/serviceSelector';
+import NextClientWindow from './components/NextClientWindow';
 import Authenticator from './components/Authenticator';
+import TicketDashboard from './components/TicketDashboard';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -17,9 +39,22 @@ function App() {
       - officer
       - (empty string)
   */
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState('admin');
   // configDone: whether the system has been configured for the first time
   const [configDone, setConfigDone] = useState(false);
+  // the services offered will be here
+  const [services, setServices] = useState();
+
+  useEffect(() => {
+    /*        apiGetServices().then(Services => {
+            setServices(Services);
+        })*/
+    const fun = async function () {
+      let myService = await apiGetServices();
+      setServices(myService);
+    };
+    fun();
+  }, []);
 
   // useEffect used to check whether the user is logged in or not
   useEffect(() => {
@@ -52,17 +87,148 @@ function App() {
     setLoggedIn(false);
   };
 
+  //
+  // Configuration code
+  //
+
+  const [serviceList, setServiceList] = useState([]);
+  const [counterList, setCounterList] = useState([]);
+  const [officerList, setOfficerList] = useState([]);
+  const [offeredServiceList, setOfferedServiceList] = useState([]);
+  const [dirty, setDirty] = useState(true);
+  const [confStep, setConfStep] = useState(1);
+
+  useEffect(() => {
+    if (dirty) {
+      callGetServices();
+    }
+  }, [dirty]);
+
+  const callGetServices = () => {
+    api_getServices()
+      .then((services) => {
+        setServiceList(services);
+        callGetCounters();
+      })
+      .catch((e) => handleErrors(e));
+  };
+
+  const callGetCounters = () => {
+    api_getCounters()
+      .then((counters) => {
+        setCounterList(counters);
+        callGetOfferedServices();
+      })
+      .catch((e) => handleErrors(e));
+  };
+
+  const callGetOfferedServices = () => {
+    api_getOfferedServices()
+      .then((os) => {
+        setOfferedServiceList(os);
+        callGetOfficers();
+      })
+      .catch((e) => handleErrors(e));
+  };
+
+  const callGetOfficers = () => {
+    api_getOfficers()
+      .then((o) => {
+        setOfficerList(o);
+        setDirty(false);
+      })
+      .catch((e) => handleErrors(e));
+  };
+
+  const handleErrors = (err) => {
+    console.log(err.error);
+  };
+
+  const deleteService = (service) => {
+    if (!service.status) {
+      service.status = 'deleted';
+      api_deleteService(service)
+        .then(() => setDirty(true))
+        .catch((e) => handleErrors(e));
+    }
+  };
+
+  const addService = (service) => {
+    service.status = 'add';
+    const id = Math.max(...serviceList.map((s) => s.id)) + 1;
+    setServiceList((oldList) => [...oldList, { id: id, ...service }]);
+    api_addService(service)
+      .then(() => setDirty(true))
+      .catch((e) => handleErrors(e));
+  };
+
+  const addCounter = (officer, services) => {
+    officer.status = 'add';
+    let oid = Math.max(...officerList.map((o) => o.id)) + 1;
+    if (officerList.length == 0) {
+      oid = 1;
+    }
+    //setOfficerList(oldList => [...oldList, { id: oid, ...officer.username }]);
+    api_addOfficer(officer)
+      .then(() => {
+        let cid = Math.max(...counterList.map((c) => c.id)) + 1;
+        if (counterList.length == 0) {
+          cid = 1;
+        }
+        //setCounterList(oldList => [...oldList, { id: cid, officer: oid }]);
+        api_addCounter({ id: cid, officer: oid })
+          .then(() => {
+            for (let i = 0; i < services.length; i++) {
+              let newService = Object.assign({}, { cid: cid, sid: services[i] });
+              let serviceName = serviceList.filter((s) => s.id == services[i]).map((s) => s.name);
+              //setOfferedServiceList(oldList => [...oldList, { counter_id: cid, service_id: services[i], service_name: serviceName }]);
+              api_addOfferedService(newService)
+                .then(() => {
+                  setDirty(true);
+                })
+                .catch((e) => handleErrors(e));
+            }
+          })
+          .catch((e) => handleErrors(e));
+      })
+      .catch((e) => handleErrors(e));
+  };
+
+  const deleteCounter = (counter) => {
+    if (!counter.status) {
+      counter.status = 'deleted';
+      api_deleteCounter(counter)
+        .then(() => {
+          api_deleteOfficer({ id: counter.officer })
+            .then(() => {
+              setDirty(true);
+            })
+            .catch((e) => handleErrors(e));
+        })
+        .catch((e) => handleErrors(e));
+    }
+  };
+
+  const handleLogout = () => {
+    api_logout();
+    setLoggedIn(false);
+  };
+
   return (
-    <Container className="App text-dark p-0 m-0" fluid>
+    <Container className="App bg-light text-dark p-0 m-0 min-vh-100" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <div />
+                <ServiceConfiguration
+                  serviceList={serviceList}
+                  onNext={() => setConfStep(2)}
+                  onDelete={deleteService}
+                  onAdd={addService}
+                />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -79,7 +245,16 @@ function App() {
           <Route path="/setup/counters">
             {loggedIn ? (
               userRole === 'admin' ? (
-                <div />
+                <CounterConfiguration
+                  serviceList={serviceList}
+                  counterList={counterList}
+                  offeredServiceList={offeredServiceList}
+                  officerList={officerList}
+                  onAdd={addCounter}
+                  onDelete={deleteCounter}
+                  onBack={() => setConfStep(1)}
+                  logout={handleLogout}
+                />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -130,7 +305,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <div />
+                <NextClientWindow />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -152,7 +327,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <Authenticator login={doLogin}/>
+              <Authenticator login={doLogin} />
             )}
           </Route>
 
@@ -165,7 +340,10 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <div />
+              <>
+                <TicketDashboard />
+                <ServiceSelector services={services} apiInsertTicket={apiInsertTicket} />
+              </>
             )}
           </Route>
 
@@ -202,14 +380,7 @@ function DefaultUserRedirect(props) {
     }
   };
 
-  return (
-    <div>
-      loggedIn ?
-      <Redirect to="/home" />
-      :
-      <Redirect to="/home" />
-    </div>
-  );
+  return renderSwitch(userRole);
 }
 
 export default App;

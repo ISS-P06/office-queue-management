@@ -11,6 +11,7 @@ function AppNavbar(props) {
 
   const handleClick = (path) => {
     history.push(path);
+    props.doLogin();
   };
 
   return (
