@@ -166,7 +166,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <TicketDashboard />
+              <TicketDashboard/>
             )}
           </Route>
 
