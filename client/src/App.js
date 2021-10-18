@@ -5,6 +5,7 @@ import { api_login, api_logout, api_getUserInfo } from './api';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
+import NextClientWindow from './components/NextClientWindow';
 import Authenticator from './components/Authenticator';
 import TicketDashboard from './components/TicketDashboard';
 
@@ -57,7 +58,6 @@ function App() {
     <Container className="App bg-light text-dark p-0 m-0 min-vh-100" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
@@ -131,7 +131,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <div />
+                <NextClientWindow />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -153,7 +153,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <Authenticator login={doLogin}/>
+              <Authenticator login={doLogin} />
             )}
           </Route>
 

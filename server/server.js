@@ -81,11 +81,36 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
   res.status(200).json({ msg: 'hello world', num: num });
 });
 
+/*** Officers APIs ***/
+/* Used to call the next client */
+app.post(
+  '/api/officers/callNextClient',
+  // TODO add isLoggedIn check
+  [check('idCounter').isInt()],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
+
+    const { idCounter, idTicketServed } = req.body;
+
+    try {
+      const id = await DAO.callNextClient(idCounter, idTicketServed);
+      console.log(id);
+      res.status(200).json(id);
+    } catch (e) {
+      // console.log(e);
+      res.status(503).json({ error: 'Error in calling the next client' });
+    }
+  }
+);
+
 // Route used to get the current queue status
 app.get('/api/getQueueData', (req, res) => {
   getQueueStatus()
-          .then(queueStatus => res.json(queueStatus))
-          .catch(()=> res.status(500).end());
+    .then((queueStatus) => res.json(queueStatus))
+    .catch(() => res.status(500).end());
 });
 
 /*** Users APIs ***/

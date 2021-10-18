@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const api_login = async (credentials) => {
+export const api_login = async (credentials) => {
   try {
     let res = await axios.post('/api/sessions', {
       username: credentials.username,
@@ -20,7 +20,7 @@ const api_login = async (credentials) => {
   }
 };
 
-const api_logout = () => {
+export const api_logout = () => {
   axios
     .delete('/api/sessions/current')
     .then((res) => {
@@ -31,21 +31,7 @@ const api_logout = () => {
     });
 };
 
-const api_getQueueData = async () => {
-  try {
-    const res = await axios.get('/api/getQueueData');
-    if (res.data) {
-      console.log(res.data);
-      return res.data;
-    } else {
-      throw res.data.error;
-    }
-  } catch (err) {
-    throw new Error('Error: could not get queue data');
-  }
-};
-
-const api_getUserInfo = async () => {
+export const api_getUserInfo = async () => {
   try {
     const res = await axios.get('/api/sessions/current');
     if (res.data.id) {
@@ -64,4 +50,36 @@ const api_getUserInfo = async () => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getQueueData };
+export const api_callNextClient = async (idCounter, idTicketServed) => {
+  try {
+    let res = await axios.post('api/officers/callNextClient', {
+      idCounter: idCounter,
+      idTicketServed: idTicketServed,
+    });
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error('There is no ticket to serve currently');
+    }
+  } catch (err) {
+    if (err) {
+      throw new Error(err);
+    } else {
+      throw new Error('Sorry, there was an error in calling the next client');
+    }
+  }
+};
+
+export const api_getQueueData = async () => {
+  try {
+    const res = await axios.get('/api/getQueueData');
+    if (res.data) {
+      console.log(res.data);
+      return res.data;
+    } else {
+      throw res.data.error;
+    }
+  } catch (err) {
+    throw new Error('Error: could not get queue data');
+  }
+};
