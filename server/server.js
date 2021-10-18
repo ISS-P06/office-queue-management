@@ -22,6 +22,7 @@ import {
   createCounter,
   createOfferedService,
   deleteCounter,
+  getOfficerCounter
 } from './dao';
 import { listOfficers, createOfficer, deleteOfficer } from './dao';
 
@@ -120,15 +121,16 @@ app.post(
     const { idCounter, idTicketServed } = req.body;
 
     try {
-      const id = await DAO.callNextClient(idCounter, idTicketServed);
-      console.log(id);
-      res.status(200).json(id);
+      const ticket = await DAO.callNextClient(idCounter, idTicketServed);
+      res.status(200).json(ticket);
     } catch (e) {
       // console.log(e);
       res.status(503).json({ error: 'Error in calling the next client' });
     }
   }
 );
+
+
 
 // Route used to get the current queue status
 app.get('/api/getQueueData', (req, res) => {
@@ -147,6 +149,8 @@ app.post('/api/insert-selected-ticket', async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+
 
 //
 // Service APIs
@@ -387,7 +391,6 @@ app.post(
 
     try {
       const id = await DAO.callNextClient(idCounter, idTicketServed);
-      console.log(id);
       res.status(200).json(id);
     } catch (e) {
       // console.log(e);
@@ -397,9 +400,10 @@ app.post(
 );
 
 // Route used to get the current queue status
-app.get('/api/getQueueData', (req, res) => {
-  getQueueStatus()
-    .then((queueStatus) => res.json(queueStatus))
+app.get('/api/officer/:id/counter', (req, res) => {
+  console.log("query");
+  getOfficerCounter(req.params.id)
+    .then((counter) => {console.log(counter); res.json(counter)})
     .catch(() => res.status(500).end());
 });
 

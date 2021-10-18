@@ -31,6 +31,24 @@ export const api_logout = () => {
     });
 };
 
+export const api_getOfficerCounterNumber = async (IDUser) => {
+  try {
+    const res = await axios.get('/api/officer/'+IDUser+'/counter');
+    if (res.data) {
+      return res.data;
+    } else {
+      throw res.data.message;
+    }
+  } catch (err) {
+    if (err.response.data.message) {
+      throw new Error(err.response.data.message);
+    } else if (err.response.data.error) {
+      throw new Error(err.response.data.error);
+    } else {
+      throw new Error('Sorry, there was an error in logging in');
+    }
+  }
+};
 export const api_getUserInfo = async () => {
   try {
     const res = await axios.get('/api/sessions/current');
@@ -49,6 +67,7 @@ export const api_getUserInfo = async () => {
     }
   }
 };
+
 
 //
 // Service API HTTP requests
@@ -268,6 +287,7 @@ export const api_callNextClient = async (idCounter, idTicketServed) => {
       idTicketServed: idTicketServed,
     });
     if (res.data) {
+      console.log(res.data);
       return res.data;
     } else {
       throw new Error('There is no ticket to serve currently');
@@ -295,7 +315,6 @@ export const api_getQueueData = async () => {
   try {
     const res = await axios.get('/api/getQueueData');
     if (res.data) {
-      console.log(res.data);
       return res.data;
     } else {
       throw res.data.error;

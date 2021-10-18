@@ -15,7 +15,7 @@ import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
 import { api_getCounters, api_getOfferedServices, api_deleteCounter } from './api';
-import { api_getOfficers, api_addOfficer, api_deleteOfficer, apiInsertTicket } from './api';
+import { api_getOfficers, api_addOfficer, api_deleteOfficer, apiInsertTicket, api_getOfficerCounterNumber } from './api';
 
 import AppNavbar from './components/AppNavbar';
 import ServiceSelector from './components/serviceSelector';
@@ -36,6 +36,8 @@ function App() {
   const [userRole, setUserRole] = useState('admin');
   // configDone: whether the system has been configured for the first time
   const [configDone, setConfigDone] = useState(false);
+  const [IDUser, setIDUser] = useState(null);
+  const [counter, setCounter] = useState(null);
 
   // useEffect used to check whether the user is logged in or not
   useEffect(() => {
@@ -43,7 +45,18 @@ function App() {
       try {
         const info = await api_getUserInfo();
         setLoggedIn(true);
+        setIDUser(info.id);
         setUserRole(info.role);
+        try{
+          if(info.role==="officer"){
+            const officerCounter = await api_getOfficerCounterNumber(info.id);
+            console.log(officerCounter);
+            setCounter(officerCounter);
+          }
+        }
+        catch (err) {
+          throw Error(err);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -286,7 +299,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <NextClientWindow />
+                <NextClientWindow counter={counter}/>
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}

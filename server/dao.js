@@ -265,7 +265,7 @@ export function callNextClient(idCounter, idTicketServed) {
         const serviceType = rows[0].id;
 
         //select the next ticket to serve
-        const sql3 = `SELECT Ticket.number as id
+        const sql3 = `SELECT Ticket.id as ticketId, Ticket.id as ticketNumber
               FROM Ticket, Service_Type
               WHERE Ticket.ref_service=Service_Type.id AND Ticket.status="in-queue" AND Ticket.ref_service=?
               ORDER BY Ticket.date`;
@@ -275,7 +275,8 @@ export function callNextClient(idCounter, idTicketServed) {
             reject(err);
             return;
           }
-          const ticketId = rows[0].id;
+          const ticketId = rows[0].ticketId;
+          const ticketNumber = rows[0].ticketNumber;
 
           //set the current ticket as served
           const query = `UPDATE ticket SET status="is-serving" WHERE id=?`;
@@ -285,10 +286,23 @@ export function callNextClient(idCounter, idTicketServed) {
               reject(err);
               return;
             }
-            resolve(ticketId);
+            resolve({"ticketId":ticketId, "ticketNumber":ticketNumber});
           });
         });
       }
+    });
+  });
+}
+
+export function getOfficerCounter(id) {
+  return new Promise((resolve, reject) => {  
+    const sql = 'SELECT Counter.id as id, Counter.number as number FROM Counter WHERE ref_officer=?';
+    db.get(sql, id, function (err,row) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve({"id": row.id, "number":row.number});
     });
   });
 }
