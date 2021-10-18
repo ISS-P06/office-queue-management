@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { api_callNextClient } from '../api';
 import AlertBox from './Message';
 
+import Store from '../store';
+
 // --- Renders the application navbar
 function NextClientWindow(props) {
 
-  const [idTicket, setIdTicket] = useState(1);
+  const [idTicket, setIdTicket] = useState(Store.get('idTicket') || null);
   const idCounter=1;
 
   const [alert, setAlert] = useState(false);
@@ -27,6 +29,10 @@ function NextClientWindow(props) {
             clearTimeout(timeId)
         }
     }
+    else{
+      setAlert(false);
+    }
+
   });
 
 
@@ -52,10 +58,20 @@ function NextClientWindow(props) {
   const callNextClient = () => {
    const nextTickedID=api_callNextClient(idCounter, idTicket).then((nextTickedID)=>{
       setIdTicket(nextTickedID);
+      saveTicket(nextTickedID);
    }).catch((err)=>{
       handleErrors("There is no client to serve");
       setIdTicket(null);
    });
+  };
+
+  
+  const saveTicket = (id) => {
+    if (!id) {
+      Store.set('idTicket', id);
+    } else {
+      Store.remove('idTicket');
+    }
   };
 
   return (
@@ -65,13 +81,14 @@ function NextClientWindow(props) {
       <h1  className="mt-5"> Counter n°: {idCounter}</h1>
       {idTicket?       <h3>You are serving ticket n°: {idTicket}</h3>
       :  <h3>You are not serving anyone, click on the button for serving a client</h3> }
-
-      <Col xs="6" md="3">
-      <Button  size="lg" className="mt-3" onClick={callNextClient}> Serve the next client </Button>
-      </Col>   
-    </Row>
+        <Col xs="6" md="3">
+        <Button size="lg" className="mt-3" onClick={callNextClient}>
+          Serve the next client
+        </Button>
+      </Col>
+      </Row>
+    
     </>
-
   );
 }
 

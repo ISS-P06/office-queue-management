@@ -2,10 +2,10 @@
 
 import express from 'express';
 import morgan from 'morgan';
-
+import cron from 'node-cron';
 import { check, validationResult, checkSchema } from 'express-validator';
 
-import { callNextClient} from './dao';
+import * as DAO from './dao';
 
 /* passport setup */
 import passport from 'passport';
@@ -54,6 +54,20 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+/* Node-cron setup
+   Reset the ticket at midnight, every day
+*/
+cron.schedule(
+  '0 0 * * *',
+  async () => {
+    await DAO.reset();
+  },
+  {
+    scheduled: true,
+    timezone: 'Europe/Rome',
+  }
+);
+
 /*** APIs ***/
 
 app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
@@ -66,6 +80,31 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
 
   res.status(200).json({ msg: 'hello world', num: num });
 });
+
+/*** Officers APIs ***/
+/* Used to call the next client */
+app.post(
+  '/api/officers/callNextClient',
+  // TODO add isLoggedIn check
+  [check('idCounter').isInt()],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
+
+    const { idCounter, idTicketServed } = req.body;
+
+    try {
+      const id = await DAO.callNextClient(idCounter, idTicketServed);
+      console.log(id);
+      res.status(200).json(id);
+    } catch (e) {
+      // console.log(e);
+      res.status(503).json({ error: 'Error in calling the next client' });
+    }
+  }
+);
 
 /*** Users APIs ***/
 /* login */
@@ -95,17 +134,6 @@ app.get('/api/sessions/current', (req, res) => {
     res.status(200).json(req.user);
   } else res.status(401).json({ error: 'Unauthenticated user!' });
 });
-
-/*** Officer APIs ***/
-/* Used to call the next client */
-app.post('/api/officer/callNextClient',(req, res) => { /*TODO: add isLoggedIn*/
-   callNextClient(req.body.idCounter, req.body.idTicketServed)
-    .then(surveys => res.status(200).json(surveys))
-    .catch(() => {
-      res.status(500).json({ error:`  Error during the call of the next client` }).end();
-    }); 
-});
-
 
 // activate the server
 app.listen(port, () => {

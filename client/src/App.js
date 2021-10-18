@@ -6,6 +6,7 @@ import { Row, Col, Container } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
 import NextClientWindow from './components/NextClientWindow';
+import Authenticator from './components/Authenticator';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -53,9 +54,10 @@ function App() {
   };
 
   return (
-    <Container className="App  p-0 m-0" fluid>
+    <Container className="App text-dark p-0 m-0" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
+        <NextClientWindow />
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
@@ -129,7 +131,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <NextClientWindow/>
+                <NextClientWindow />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -151,7 +153,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <div />
+              <Authenticator login={doLogin} />
             )}
           </Route>
 

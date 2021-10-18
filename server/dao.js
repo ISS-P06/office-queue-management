@@ -1,6 +1,7 @@
 'use strict';
 
 import db from './db';
+
 export function callNextClient(idCounter, idTicketServed) {
     return new Promise((resolve, reject) => {
      
@@ -60,7 +61,25 @@ export function callNextClient(idCounter, idTicketServed) {
                 return;
               }
           }
-        });
-     
     });
-  }
+  });
+}
+
+//Reset tickets and queues
+export const reset = () => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+                    UPDATE Ticket
+                    SET status = "not_served"
+                    WHERE status = "in_queue"
+                   `;
+    db.run(sql, [], (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      console.log(`Tickets updated : ${this.changes}`);
+      resolve(this.changes);
+    });
+  });
+};

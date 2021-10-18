@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const api_login = async (credentials) => {
+export const api_login = async (credentials) => {
   try {
     let res = await axios.post('/api/sessions', {
       username: credentials.username,
@@ -20,7 +20,7 @@ const api_login = async (credentials) => {
   }
 };
 
-const api_logout = () => {
+export const api_logout = () => {
   axios
     .delete('/api/sessions/current')
     .then((res) => {
@@ -31,7 +31,7 @@ const api_logout = () => {
     });
 };
 
-const api_getUserInfo = async () => {
+export const api_getUserInfo = async () => {
   try {
     const res = await axios.get('/api/sessions/current');
     if (res.data.id) {
@@ -50,9 +50,9 @@ const api_getUserInfo = async () => {
   }
 };
 
-const api_callNextClient = async (idCounter, idTicketServed) => {
+export const api_callNextClient = async (idCounter, idTicketServed) => {
   try {
-    let res = await axios.post('api/officer/callNextClient', {
+    let res = await axios.post('api/officers/callNextClient', {
       idCounter: idCounter,
       idTicketServed: idTicketServed,
     });
@@ -70,4 +70,3 @@ const api_callNextClient = async (idCounter, idTicketServed) => {
       }
   }
 };
-export { api_login, api_logout, api_getUserInfo, api_callNextClient };
