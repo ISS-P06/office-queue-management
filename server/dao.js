@@ -41,7 +41,6 @@ export function callNextClient(idCounter, idTicketServed) {
                 sql3,
                 rows[0].id, (err,rows) => {
                   //set the current ticket as served
-                  console.log(rows);
                   const query = `UPDATE ticket SET status="is-serving" WHERE id=?`;
                   db.run(
                     query,

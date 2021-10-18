@@ -8,7 +8,7 @@ import Store from '../store';
 // --- Renders the application navbar
 function NextClientWindow(props) {
 
-  const [idTicket, setIdTicket] = useState(Store.get('idTicket') || null);
+  const [idTicket, setIdTicket] = useState(Store.get('idTicket') || 1); /*TODO: change 1 to null*/
   const idCounter=1;
 
   const [alert, setAlert] = useState(false);
@@ -41,22 +41,10 @@ function NextClientWindow(props) {
     setMessage({ msg: err, type: 'danger' });
    }
 
-    // On componentDidMount set the timer
-    useEffect(() => {
-      if (alert) {
-          const timeId = setTimeout(() => {
-              // After 5 seconds set the show value to false
-              setAlert(false)
-          }, 5000)
-          return () => {
-              clearTimeout(timeId)
-          }
-      }
-  }, [alert, setAlert]);
 
 
   const callNextClient = () => {
-   const nextTickedID=api_callNextClient(idCounter, idTicket).then((nextTickedID)=>{
+   api_callNextClient(idCounter, idTicket).then((nextTickedID)=>{
       setIdTicket(nextTickedID);
       saveTicket(nextTickedID);
    }).catch((err)=>{
