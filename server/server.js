@@ -5,10 +5,13 @@ import morgan from 'morgan';
 
 import { check, validationResult, checkSchema } from 'express-validator';
 
+import { callNextClient} from './dao';
+
 /* passport setup */
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
+
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -95,8 +98,12 @@ app.get('/api/sessions/current', (req, res) => {
 
 /*** Officer APIs ***/
 /* Used to call the next client */
-app.post('/api/officer/callNextClient', function (req, res, next) {
-  console.log("backend");
+app.post('/api/officer/callNextClient',(req, res) => { /*TODO: add isLoggedIn*/
+   callNextClient(req.body.idCounter, req.body.idTicketServed)
+    .then(surveys => res.status(200).json(surveys))
+    .catch(() => {
+      res.status(500).json({ error:`  Error during the call of the next client` }).end();
+    }); 
 });
 
 
