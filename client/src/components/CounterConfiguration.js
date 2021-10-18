@@ -98,7 +98,7 @@ const CounterForm = (props) => {
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-4" controlId='selectedCourse'>
-                        <Form.Label>Officier password</Form.Label>
+                        <Form.Label>Officer password</Form.Label>
                         <Form.Control type="password" name="password" value={password}
                             onChange={(ev) => setPassword(ev.target.value)} required autoFocus />
                         <Form.Control.Feedback type="invalid">
