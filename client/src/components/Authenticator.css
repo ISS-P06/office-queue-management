@@ -5,15 +5,9 @@ h2 {
 
 .main {
     margin: 10% 30%;
-    background-color: white;
-}
-
-.btn-primary {
-    margin: 20px 0;
 }
 
 Form { 
-    background-color: white;
     text-align: left;
 }
 

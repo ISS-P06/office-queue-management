@@ -25,9 +25,17 @@ import {
 } from './dao';
 import { listOfficers, createOfficer, deleteOfficer } from './dao';
 
+//const userDao = require('./user-dao'); // module for accessing the users in the DB
+import userDao from './user-daor';
+
 passport.use(
   new Strategy((username, password, done) => {
-    // todo: userDao.getUser
+    userDao.getUser(username, password).then((user) => {
+      if (!user)
+        return done(null, false, { message: 'Incorrect username and/or password.' });
+        
+      return done(null, user);
+    })
   })
 );
 
@@ -36,7 +44,12 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  // todo: userDao.getUserById
+  userDao.getUserById(id)
+    .then(user => {
+      done(null, user); // this will be available in req.user
+    }).catch(err => {
+      done(err, null);
+    });
 });
 
 /* express setup */
