@@ -1,24 +1,42 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Switch, Route, Redirect} from 'react-router-dom';
-import {api_login, api_logout, api_getUserInfo} from './api';
+import {api_login, api_logout, api_getUserInfo, apiGetServices, apiInsertTicket} from './api';
 import {Row, Col, Container} from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import AppNavbar from './components/AppNavbar';
+import ServiceSelector from './components/serviceSelector'
 
 function App() {
-  // loggedIn: whether the user is logged in or not
-  const [loggedIn, setLoggedIn] = useState(false);
-  // userRole: the logged-in user's role; default: empty string
-  /* Possible values:
-      - admin
-      - manager
-      - officer
-      - (empty string)
-  */
-  const [userRole, setUserRole] = useState("");
-  // configDone: whether the system has been configured for the first time
-  const [configDone, setConfigDone] = useState(false);
+    // loggedIn: whether the user is logged in or not
+    const [loggedIn, setLoggedIn] = useState(false);
+    // userRole: the logged-in user's role; default: empty string
+    /* Possible values:
+        - admin
+        - manager
+        - officer
+        - (empty string)
+    */
+    const [userRole, setUserRole] = useState("");
+    // configDone: whether the system has been configured for the first time
+    const [configDone, setConfigDone] = useState(false);
+    // the services offered will be here
+    const [services, setServices] = useState();
+
+    // apiGetServices().then(services => {console.log('services' + services); setServices(services);})
+
+
+    useEffect(() => {
+/*        apiGetServices().then(Services => {
+            setServices(Services);
+        })*/
+            const fun = async function() {
+              let myService = await apiGetServices();
+              setServices(myService);
+            }
+            fun();
+    }, [])
+
 
   // useEffect used to check whether the user is logged in or not
   useEffect(()=> {
@@ -51,12 +69,15 @@ function App() {
     setLoggedIn(false);
   }
 
-  return (
-    <Container className="App bg-dark text-dark p-0 m-0" fluid>
-      <Router>
-        <AppNavbar 
-          loggedIn={loggedIn}
-          doLogout={doLogout}/>
+
+    return (
+        <Container className="App bg-dark text-dark p-0 m-0" fluid>
+            <Router>
+                <AppNavbar
+                    loggedIn={loggedIn}
+                    doLogout={doLogout}
+                    doLogin={doLogin}
+                />
 
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
@@ -152,18 +173,22 @@ function App() {
             }
           </Route>
 
-          {/* Home/customer route */}
-          <Route path="/home">
-            {
-              loggedIn ?
-                <DefaultUserRedirect
-                    loggedIn = {loggedIn}
-                    userRole = {userRole}
-                    configDone = {configDone}/>
-                :
-                <div/>
-            }
-          </Route>
+                    {/* Home/customer route */}
+                    <Route path="/home">
+                        {
+                            loggedIn ?
+                                <DefaultUserRedirect
+                                    loggedIn={loggedIn}
+                                    userRole={userRole}
+                                    configDone={configDone}/>
+                                :
+                                                <ServiceSelector
+                                                services = {services}
+                                                apiInsertTicket={apiInsertTicket}
+                                                />
+
+                        }
+                    </Route>
 
           {/* Default route - redirects to /home */}
           <Route>

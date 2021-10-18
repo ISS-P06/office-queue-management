@@ -5,6 +5,8 @@ import morgan from "morgan";
 
 import { check, validationResult, checkSchema } from "express-validator";
 
+import {getServices,insertNewTicket} from './dao'
+
 /* passport setup */
 import passport from "passport";
 import session from "express-session";
@@ -94,6 +96,27 @@ app.get("/api/sessions/current", (req, res) => {
     res.status(200).json(req.user);
   } else res.status(401).json({ error: "Unauthenticated user!" });
 });
+
+// get the services and their types
+app.get('/api/get_service_types', (req, res) => {
+    getServices().then(services => {
+        return res.json(services)
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json(err)
+    });
+})
+
+//insert the selected ticket
+app.post('/api/insert-selected-ticket', async (req, res)=>{
+    let serviceID = req.body.serviceID;
+    try{
+        await insertNewTicket(serviceID);
+        res.end();
+    }catch (err){
+        res.status(500).json(err);
+    }
+})
 
 // activate the server
 app.listen(port, () => {

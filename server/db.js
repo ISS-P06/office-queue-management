@@ -1,8 +1,8 @@
-const sqlite = require('sqlite3');
-// todo: aggiungere nome file db
-const db = new sqlite.Database('database.db', (err) => {
-  if (err)
-  { throw err; }
+'use strict'
+import sqlite3 from 'sqlite3';
+
+const db = new sqlite3.Database('database.db', (err) => {
+  if (err) { throw err; }
 });
 
-module.exports = db;
+export default db;
