@@ -55,21 +55,23 @@ const api_callNextClient = async (idCounter, idTicketServed) => {
   console.log(idCounter);
   console.log(idTicketServed);
   try {
-    let res = await axios.post('/api/officer/callNextClient', {
+    let res = await axios.post('api/officer/callNextClient', {
       idCounter: idCounter,
       idTicketServed: idTicketServed,
     });
+    console.log(res.data);
     if (res.data) {
       return res.data;
     } else {
-      throw new Error(res.data.message);
+      throw new Error("There is no ticket to serve currently");
     }
   } catch (err) {
-    if (err.response.status == 401) {
-      throw new Error(err.response.data);
-    } else {
-      throw new Error('Sorry, there was an error in calling the next client');
-    }
+      if(err){
+        throw new Error(err);
+      }
+      else{
+        throw new Error('Sorry, there was an error in calling the next client');
+      }
   }
 };
 export { api_login, api_logout, api_getUserInfo, api_callNextClient };
