@@ -13,6 +13,7 @@ const services = [
     ];
 
 function TicketDashboard() {
+    const [loading, setLoading] = useState(true);
     const [queueData, setQueueData] = useState([{id: -1}]);
     const [queueDataChunks, setQueueDataChunks] = useState([]);
 
@@ -62,6 +63,7 @@ function TicketDashboard() {
     useEffect(() => {
         getQueueData();
         const i = setInterval(() => getQueueData(), 10000);
+        setLoading(false);
 
         return () => clearInterval(i);
     }, []);
@@ -90,13 +92,18 @@ function TicketDashboard() {
             <Col xs={2}/>
             <Col xs={8}>
                 {
-                    queueData.length <= 0 ?
-                    <Row className='text-light'>
-                        No queue data found
-                    </Row>
+                    loading ?
+                        <Row className='text-light'>
+                            Loading queue data...
+                        </Row>
                     :
-                    <QueueStatusTable
-                        queueDataArray = {queueData}/>
+                    queueData.length <= 0 ?
+                        <Row className='text-light'>
+                            No queue data found
+                        </Row>
+                        :
+                        <QueueStatusTable
+                            queueDataArray = {queueData}/>
                 }
             </Col>
             <Col xs={2}/>
