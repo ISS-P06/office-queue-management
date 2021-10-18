@@ -74,7 +74,7 @@ export function listCounters() {
         reject(err);
         return;
       }
-      const counters = rows.map((c) => ({ id: c.id, officer: c.ref_officer }));
+      const counters = rows.map((c) => ({ id: c.id, officer: c.ref_officer, number: c.number }));
       resolve(counters);
     });
   });
@@ -103,8 +103,8 @@ export function listOfferedServices() {
 // add a new counter
 export function createCounter(c) {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO Counter(id, ref_officer) VALUES(?, ?)';
-    db.run(sql, [c.id, c.officer], function (err) {
+    const sql = 'INSERT INTO Counter(ref_officer, number) VALUES(?, ?)';
+    db.run(sql, [c.officer, c.id], function (err) {
       if (err) {
         reject(err);
         return;
