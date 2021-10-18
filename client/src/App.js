@@ -15,13 +15,7 @@ import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
 import { api_getCounters, api_getOfferedServices, api_deleteCounter } from './api';
-import {
-  api_getOfficers,
-  api_addOfficer,
-  api_deleteOfficer,
-  apiGetServices,
-  apiInsertTicket,
-} from './api';
+import { api_getOfficers, api_addOfficer, api_deleteOfficer, apiInsertTicket } from './api';
 
 import AppNavbar from './components/AppNavbar';
 import ServiceSelector from './components/serviceSelector';
@@ -42,19 +36,6 @@ function App() {
   const [userRole, setUserRole] = useState('admin');
   // configDone: whether the system has been configured for the first time
   const [configDone, setConfigDone] = useState(false);
-  // the services offered will be here
-  const [services, setServices] = useState();
-
-  useEffect(() => {
-    /*        apiGetServices().then(Services => {
-            setServices(Services);
-        })*/
-    const fun = async function () {
-      let myService = await apiGetServices();
-      setServices(myService);
-    };
-    fun();
-  }, []);
 
   // useEffect used to check whether the user is logged in or not
   useEffect(() => {
@@ -342,7 +323,7 @@ function App() {
             ) : (
               <>
                 <TicketDashboard />
-                <ServiceSelector services={services} apiInsertTicket={apiInsertTicket} />
+                <ServiceSelector services={serviceList} apiInsertTicket={apiInsertTicket} />
               </>
             )}
           </Route>

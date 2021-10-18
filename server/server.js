@@ -6,7 +6,7 @@ import cron from 'node-cron';
 
 import { check, validationResult, checkSchema } from 'express-validator';
 
-import { getServices, insertNewTicket } from './dao';
+import { insertNewTicket } from './dao';
 import * as DAO from './dao';
 
 /* passport setup */
@@ -137,24 +137,12 @@ app.get('/api/getQueueData', (req, res) => {
     .catch(() => res.status(500).end());
 });
 
-// get the services and their types
-app.get('/api/get_service_types', (req, res) => {
-  getServices()
-    .then((services) => {
-      return res.json(services);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
-
 //insert the selected ticket
 app.post('/api/insert-selected-ticket', async (req, res) => {
   let serviceID = req.body.serviceID;
   try {
-    await insertNewTicket(serviceID);
-    res.end();
+    const idTicket = await insertNewTicket(serviceID);
+    res.status(200).json(idTicket);
   } catch (err) {
     res.status(500).json(err);
   }
