@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import AppNavbar from './components/AppNavbar';
 import NextClientWindow from './components/NextClientWindow';
 import Authenticator from './components/Authenticator';
+import TicketDashboard from './components/TicketDashboard';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -54,10 +55,9 @@ function App() {
   };
 
   return (
-    <Container className="App text-dark p-0 m-0" fluid>
+    <Container className="App bg-light text-dark p-0 m-0 min-vh-100" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-        <NextClientWindow />
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
@@ -166,7 +166,7 @@ function App() {
                 configDone={configDone}
               />
             ) : (
-              <div />
+              <TicketDashboard />
             )}
           </Route>
 

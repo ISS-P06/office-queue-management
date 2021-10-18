@@ -11,7 +11,7 @@ import * as DAO from './dao';
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
-
+import { getQueueStatus } from './queue-dao';
 
 passport.use(
   new Strategy((username, password, done) => {
@@ -105,6 +105,13 @@ app.post(
     }
   }
 );
+
+// Route used to get the current queue status
+app.get('/api/getQueueData', (req, res) => {
+  getQueueStatus()
+    .then((queueStatus) => res.json(queueStatus))
+    .catch(() => res.status(500).end());
+});
 
 /*** Users APIs ***/
 /* login */
