@@ -58,6 +58,7 @@ function App() {
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
         <NextClientWindow />
+
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
