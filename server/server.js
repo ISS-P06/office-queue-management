@@ -2,16 +2,25 @@
 
 import express from 'express';
 import morgan from 'morgan';
-
+import cron from 'node-cron';
 import { check, validationResult, checkSchema } from 'express-validator';
+
+import * as DAO from './dao';
 
 /* passport setup */
 import passport from 'passport';
 import session from 'express-session';
 import { Strategy } from 'passport-local';
+import { getQueueStatus } from './queue-dao';
 
 import { listServices, createService, deleteServices, deleteService } from './dao';
-import { listCounters, listOfferedServices, createCounter, createOfferedService, deleteCounter } from './dao';
+import {
+  listCounters,
+  listOfferedServices,
+  createCounter,
+  createOfferedService,
+  deleteCounter,
+} from './dao';
 import { listOfficers, createOfficer, deleteOfficer } from './dao';
 
 passport.use(
@@ -55,6 +64,20 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+/* Node-cron setup
+   Reset the ticket at midnight, every day
+*/
+cron.schedule(
+  '0 0 * * *',
+  async () => {
+    await DAO.reset();
+  },
+  {
+    scheduled: true,
+    timezone: 'Europe/Rome',
+  }
+);
+
 /*** APIs ***/
 
 app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
@@ -76,17 +99,19 @@ app.get('/api/hello/:num', [check('num').isInt()], (req, res) => {
 // GET /api/services
 app.get('/api/services', (req, res) => {
   listServices()
-    .then(services => res.json(services))
+    .then((services) => res.json(services))
     .catch(() => res.status(500).end());
 });
 
 // POST /api/services
-app.post('/api/services',
+app.post(
+  '/api/services',
   //isLoggedIn,
   [
     check('name').isLength({ min: 1, max: 100 }),
-    check('service_time').isFloat({ min: 0.01, max: 1440.00 }),
-  ], async (req, res) => {
+    check('service_time').isFloat({ min: 0.01, max: 1440.0 }),
+  ],
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -99,12 +124,16 @@ app.post('/api/services',
       await createService(service);
       res.status(201).json({});
     } catch (err) {
-      res.status(503).json({ error: `Database error during the creation of service ${service.name}.` });
+      res
+        .status(503)
+        .json({ error: `Database error during the creation of service ${service.name}.` });
     }
-  });
+  }
+);
 
 // DELETE /api/services/<id>
-app.delete('/api/services/:id',
+app.delete(
+  '/api/services/:id',
   //isLoggedIn,
   [check('id').isInt()],
   async (req, res) => {
@@ -116,12 +145,16 @@ app.delete('/api/services/:id',
       await deleteService(req.params.id);
       res.status(200).json({});
     } catch (err) {
-      res.status(503).json({ error: `Database error during the deletion of service ${req.params.id}.` });
+      res
+        .status(503)
+        .json({ error: `Database error during the deletion of service ${req.params.id}.` });
     }
-  });
+  }
+);
 
 // DELETE /api/services
-app.delete('/api/services',
+app.delete(
+  '/api/services',
   //isLoggedIn,
   async (req, res) => {
     try {
@@ -130,7 +163,8 @@ app.delete('/api/services',
     } catch (err) {
       res.status(503).json({ error: `Database error during the deletion of services.` });
     }
-  });
+  }
+);
 
 //
 // Officer APIs
@@ -140,17 +174,19 @@ app.delete('/api/services',
 // GET /api/officers
 app.get('/api/officers', (req, res) => {
   listOfficers()
-    .then(officers => res.json(officers))
+    .then((officers) => res.json(officers))
     .catch(() => res.status(500).end());
 });
 
 // POST /api/officers
-app.post('/api/officers',
+app.post(
+  '/api/officers',
   //isLoggedIn,
   [
     check('username').isLength({ min: 1, max: 100 }),
     check('password').isLength({ min: 8, max: 20 }),
-  ], async (req, res) => {
+  ],
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -158,19 +194,22 @@ app.post('/api/officers',
     const officer = {
       username: req.body.username,
       password: req.body.password,
-      role: "officer"
+      role: 'officer',
     };
     try {
       await createOfficer(officer);
       res.status(201).json({});
     } catch (err) {
-      res.status(503).json({ error: `Database error during the creation of officer ${officer.username}.` });
+      res
+        .status(503)
+        .json({ error: `Database error during the creation of officer ${officer.username}.` });
     }
-  });
-
+  }
+);
 
 // DELETE /api/officers/<id>
-app.delete('/api/officers/:id',
+app.delete(
+  '/api/officers/:id',
   //isLoggedIn,
   [check('id').isInt()],
   async (req, res) => {
@@ -182,9 +221,12 @@ app.delete('/api/officers/:id',
       await deleteOfficer(req.params.id);
       res.status(200).json({});
     } catch (err) {
-      res.status(503).json({ error: `Database error during the deletion of officer ${req.params.id}.` });
+      res
+        .status(503)
+        .json({ error: `Database error during the deletion of officer ${req.params.id}.` });
     }
-  });
+  }
+);
 
 //
 // Counter APIs
@@ -194,24 +236,23 @@ app.delete('/api/officers/:id',
 // GET /api/counters
 app.get('/api/counters', (req, res) => {
   listCounters()
-    .then(counters => res.json(counters))
+    .then((counters) => res.json(counters))
     .catch(() => res.status(500).end());
 });
 
 // GET /api/offered-services
 app.get('/api/offered-services', (req, res) => {
   listOfferedServices()
-    .then(services => res.json(services))
+    .then((services) => res.json(services))
     .catch(() => res.status(500).end());
 });
 
 // POST /api/counters
-app.post('/api/counters',
+app.post(
+  '/api/counters',
   //isLoggedIn,
-  [
-    check('id').isInt(),
-    check('officer').isInt(),
-  ], async (req, res) => {
+  [check('id').isInt(), check('officer').isInt()],
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -226,15 +267,15 @@ app.post('/api/counters',
     } catch (err) {
       res.status(503).json({ error: `Database error during the creation of the counter` });
     }
-  });
+  }
+);
 
 // POST /api/offered-services
-app.post('/api/offered-services',
+app.post(
+  '/api/offered-services',
   //isLoggedIn,
-  [
-    check('cid').isInt(),
-    check('sid').isInt(),
-  ], async (req, res) => {
+  [check('cid').isInt(), check('sid').isInt()],
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
@@ -249,10 +290,12 @@ app.post('/api/offered-services',
     } catch (err) {
       res.status(503).json({ error: `Database error during the creation of the offered service` });
     }
-  });
+  }
+);
 
 // DELETE /api/counters/<id>
-app.delete('/api/counters/:id',
+app.delete(
+  '/api/counters/:id',
   //isLoggedIn,
   [check('id').isInt()],
   async (req, res) => {
@@ -264,11 +307,44 @@ app.delete('/api/counters/:id',
       await deleteCounter(req.params.id);
       res.status(200).json({});
     } catch (err) {
-      res.status(503).json({ error: `Database error during the deletion of counter ${req.params.id}.` });
+      res
+        .status(503)
+        .json({ error: `Database error during the deletion of counter ${req.params.id}.` });
     }
-  });
+  }
+);
 
+/*** Officers APIs ***/
+/* Used to call the next client */
+app.post(
+  '/api/officers/callNextClient',
+  // TODO add isLoggedIn check
+  [check('idCounter').isInt()],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
 
+    const { idCounter, idTicketServed } = req.body;
+
+    try {
+      const id = await DAO.callNextClient(idCounter, idTicketServed);
+      console.log(id);
+      res.status(200).json(id);
+    } catch (e) {
+      // console.log(e);
+      res.status(503).json({ error: 'Error in calling the next client' });
+    }
+  }
+);
+
+// Route used to get the current queue status
+app.get('/api/getQueueData', (req, res) => {
+  getQueueStatus()
+    .then((queueStatus) => res.json(queueStatus))
+    .catch(() => res.status(500).end());
+});
 
 /*** Users APIs ***/
 /* login */

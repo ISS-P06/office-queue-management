@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const api_login = async (credentials) => {
+export const api_login = async (credentials) => {
   try {
     let res = await axios.post('/api/sessions', {
       username: credentials.username,
@@ -20,7 +20,7 @@ const api_login = async (credentials) => {
   }
 };
 
-const api_logout = () => {
+export const api_logout = () => {
   axios
     .delete('/api/sessions/current')
     .then((res) => {
@@ -31,7 +31,7 @@ const api_logout = () => {
     });
 };
 
-const api_getUserInfo = async () => {
+export const api_getUserInfo = async () => {
   try {
     const res = await axios.get('/api/sessions/current');
     if (res.data.id) {
@@ -54,7 +54,7 @@ const api_getUserInfo = async () => {
 // Service API HTTP requests
 //
 
-const api_getServices = async () => {
+export const api_getServices = async () => {
   try {
     const res = await axios.get('/api/services');
     if (res.data) {
@@ -71,7 +71,7 @@ const api_getServices = async () => {
   }
 };
 
-const api_addService = async (service) => {
+export const api_addService = async (service) => {
   try {
     const res = await axios.post('/api/services', {
       name: service.name,
@@ -91,7 +91,7 @@ const api_addService = async (service) => {
   }
 };
 
-const api_deleteService = async (service) => {
+export const api_deleteService = async (service) => {
   try {
     const res = await axios.delete('/api/services/' + service.id);
     if (res.data) {
@@ -112,7 +112,7 @@ const api_deleteService = async (service) => {
 // Counter API HTTP requests
 //
 
-const api_getCounters = async () => {
+export const api_getCounters = async () => {
   try {
     const res = await axios.get('/api/counters');
     if (res.data) {
@@ -129,7 +129,7 @@ const api_getCounters = async () => {
   }
 };
 
-const api_getOfferedServices = async () => {
+export const api_getOfferedServices = async () => {
   try {
     const res = await axios.get('/api/offered-services');
     if (res.data) {
@@ -146,7 +146,7 @@ const api_getOfferedServices = async () => {
   }
 };
 
-const api_addCounter = async (counter) => {
+export const api_addCounter = async (counter) => {
   try {
     const res = await axios.post('/api/counters', {
       id: counter.id,
@@ -166,7 +166,7 @@ const api_addCounter = async (counter) => {
   }
 };
 
-const api_addOfferedService = async (os) => {
+export const api_addOfferedService = async (os) => {
   try {
     const res = await axios.post('/api/offered-services', {
       cid: os.cid,
@@ -186,7 +186,7 @@ const api_addOfferedService = async (os) => {
   }
 };
 
-const api_deleteCounter = async (counter) => {
+export const api_deleteCounter = async (counter) => {
   try {
     const res = await axios.delete('/api/counters/' + counter.id);
     if (res.data) {
@@ -207,7 +207,7 @@ const api_deleteCounter = async (counter) => {
 // Officer API HTTP requests
 //
 
-const api_getOfficers = async () => {
+export const api_getOfficers = async () => {
   try {
     const res = await axios.get('/api/officers');
     if (res.data) {
@@ -224,7 +224,7 @@ const api_getOfficers = async () => {
   }
 };
 
-const api_addOfficer = async (officer) => {
+export const api_addOfficer = async (officer) => {
   try {
     const res = await axios.post('/api/officers', {
       username: officer.username,
@@ -244,7 +244,7 @@ const api_addOfficer = async (officer) => {
   }
 };
 
-const api_deleteOfficer = async (officer) => {
+export const api_deleteOfficer = async (officer) => {
   try {
     const res = await axios.delete('/api/officers/' + officer.id);
     if (res.data) {
@@ -261,4 +261,36 @@ const api_deleteOfficer = async (officer) => {
   }
 };
 
-export { api_login, api_logout, api_getUserInfo, api_getServices, api_deleteService, api_addService, api_getCounters, api_getOfferedServices, api_getOfficers, api_addOfficer, api_addCounter, api_addOfferedService, api_deleteCounter, api_deleteOfficer };
+export const api_callNextClient = async (idCounter, idTicketServed) => {
+  try {
+    let res = await axios.post('api/officers/callNextClient', {
+      idCounter: idCounter,
+      idTicketServed: idTicketServed,
+    });
+    if (res.data) {
+      return res.data;
+    } else {
+      throw new Error('There is no ticket to serve currently');
+    }
+  } catch (err) {
+    if (err) {
+      throw new Error(err);
+    } else {
+      throw new Error('Sorry, there was an error in calling the next client');
+    }
+  }
+};
+
+export const api_getQueueData = async () => {
+  try {
+    const res = await axios.get('/api/getQueueData');
+    if (res.data) {
+      console.log(res.data);
+      return res.data;
+    } else {
+      throw res.data.error;
+    }
+  } catch (err) {
+    throw new Error('Error: could not get queue data');
+  }
+};
