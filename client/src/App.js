@@ -56,7 +56,6 @@ function App() {
     <Container className="App  p-0 m-0" fluid>
       <Router>
         <AppNavbar loggedIn={loggedIn} doLogout={doLogout} />
-        <NextClientWindow/>
         <Switch>
           {/* Admin-exclusive route for the configuration of services*/}
           <Route path="/setup/services">
