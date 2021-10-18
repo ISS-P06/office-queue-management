@@ -32,7 +32,7 @@ export async function insertNewTicket(serviceID) {
         reject(err);
         return;
       } else {
-        resolve(0);
+        resolve(ticketNumber);
       }
     });
   });

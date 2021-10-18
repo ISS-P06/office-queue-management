@@ -82,7 +82,7 @@ function TicketDashboard() {
     
     return (
         <>
-        <Row className="text-dark">
+        <Row className="text-dark mt-3">
             <h3>
                 Currently serving numbers...
             </h3>

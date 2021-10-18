@@ -15,13 +15,21 @@ import ServiceConfiguration from './components/ServiceConfiguration';
 import CounterConfiguration from './components/CounterConfiguration';
 import { api_getServices, api_addService, api_deleteService } from './api';
 import { api_getCounters, api_getOfferedServices, api_deleteCounter } from './api';
-import { api_getOfficers, api_addOfficer, api_deleteOfficer, apiInsertTicket, api_getOfficerCounterNumber } from './api';
+import {
+  api_getOfficers,
+  api_addOfficer,
+  api_deleteOfficer,
+  api_insertTicket,
+  api_getOfficerCounterNumber,
+} from './api';
 
 import AppNavbar from './components/AppNavbar';
 import ServiceSelector from './components/serviceSelector';
 import NextClientWindow from './components/NextClientWindow';
 import Authenticator from './components/Authenticator';
 import TicketDashboard from './components/TicketDashboard';
+import MyTicketList from './components/MyTicketsList';
+import Store from './store';
 
 function App() {
   // loggedIn: whether the user is logged in or not
@@ -47,13 +55,12 @@ function App() {
         setLoggedIn(true);
         setIDUser(info.id);
         setUserRole(info.role);
-        try{
-          if(info.role==="officer"){
+        try {
+          if (info.role === 'officer') {
             const officerCounter = await api_getOfficerCounterNumber(info.id);
             setCounter(officerCounter);
           }
-        }
-        catch (err) {
+        } catch (err) {
           throw Error(err);
         }
       } catch (err) {
@@ -87,6 +94,7 @@ function App() {
   const [serviceList, setServiceList] = useState([]);
   const [counterList, setCounterList] = useState([]);
   const [officerList, setOfficerList] = useState([]);
+  const [ticketList, setTicketList] = useState(Store.get('myTickets') || []);
   const [offeredServiceList, setOfferedServiceList] = useState([]);
   const [dirty, setDirty] = useState(true);
   const [confStep, setConfStep] = useState(1);
@@ -185,6 +193,30 @@ function App() {
           .catch((e) => handleErrors(e));
       })
       .catch((e) => handleErrors(e));
+  };
+
+  const handleTicketInsert = async (serviceId) => {
+    const ticketNum = await api_insertTicket(serviceId);
+    const service = serviceList.filter((s) => s.id === serviceId)[0];
+    const ticket = { number: ticketNum, service: service };
+
+    setTicketList((tl) => [ticket, ...tl]);
+    setDirty(true);
+    Store.setWithTTL('myTickets', [ticket, ...ticketList]);
+  };
+
+  const handleTicketDeleteAll = () => {
+    setTicketList([]);
+    setDirty(true);
+    Store.remove('myTickets');
+  };
+
+  const handleTicketDeleteSingle = (ticket) => {
+    const newList = ticketList.filter((t) => t.number !== ticket.number);
+
+    setTicketList(newList);
+    setDirty(true);
+    Store.setWithTTL('myTickets', newList);
   };
 
   const deleteCounter = (counter) => {
@@ -298,7 +330,7 @@ function App() {
           <Route path="/counter">
             {loggedIn ? (
               userRole === 'officer' ? (
-                <NextClientWindow counter={counter}/>
+                <NextClientWindow counter={counter} />
               ) : (
                 <DefaultUserRedirect
                   loggedIn={loggedIn}
@@ -335,7 +367,12 @@ function App() {
             ) : (
               <>
                 <TicketDashboard />
-                <ServiceSelector services={serviceList} apiInsertTicket={apiInsertTicket} />
+                <ServiceSelector services={serviceList} insertTicket={handleTicketInsert} />
+                <MyTicketList
+                  tickets={ticketList}
+                  deleteSingleTicket={handleTicketDeleteSingle}
+                  deleteAllTickets={handleTicketDeleteAll}
+                />
               </>
             )}
           </Route>

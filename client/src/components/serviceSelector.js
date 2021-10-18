@@ -2,38 +2,32 @@ import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 
 const ServiceSelector = function (props) {
   const services = props.services;
-  const apiInsertTicket = props.apiInsertTicket;
+  const insertTicket = props.insertTicket;
+
   return (
-    <>
-      <Row>
-        <Col xs={{ span: 4, offset: 4 }}>
-          <ListGroup variant="flush">
-            {services != null ? (
-              services.map((service) => (
-                <ListGroup.Item>
-                  <ServiceItem service={service} insertTicket={() => apiInsertTicket(service.id)} />
-                </ListGroup.Item>
-              ))
-            ) : (
-              <div />
-            )}
-          </ListGroup>
-        </Col>
+    <Row className="p-5">
+      <Row className="text-dark">
+        <h3>Select a service</h3>
       </Row>
-    </>
+      {services != null
+        ? services.map((service) => (
+            <Col xs={{ span: 4 }}>
+              <ServiceItem service={service} insertTicket={() => insertTicket(service.id)} />
+            </Col>
+          ))
+        : null}
+    </Row>
   );
 };
 
 const ServiceItem = function (props) {
   const service = props.service;
   return (
-    <>
-      <Card>
-        <Button as="Card.Header" style={{ fontSize: '2rem' }} onClick={props.insertTicket}>
-          {service.name}
-        </Button>
-      </Card>
-    </>
+    <Card className="mt-3">
+      <Button style={{ fontSize: '2rem' }} onClick={props.insertTicket}>
+        {service.name}
+      </Button>
+    </Card>
   );
 };
 
