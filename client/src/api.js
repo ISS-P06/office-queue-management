@@ -51,15 +51,11 @@ const api_getUserInfo = async () => {
 };
 
 const api_callNextClient = async (idCounter, idTicketServed) => {
-  console.log(api_callNextClient);
-  console.log(idCounter);
-  console.log(idTicketServed);
   try {
     let res = await axios.post('api/officer/callNextClient', {
       idCounter: idCounter,
       idTicketServed: idTicketServed,
     });
-    console.log(res.data);
     if (res.data) {
       return res.data;
     } else {
