@@ -8,8 +8,8 @@ import Store from '../store';
 // --- Renders the application navbar
 function NextClientWindow(props) {
 
-  const [idTicket, setIdTicket] = useState( 1 || Store.get('idTicket')); /*TODO: change 1 to null and the order*/
-  const [numberTicket, setNumberTicket] = useState( 1 || Store.get('numberTicket')); /*TODO: change 1 to null and the order*/
+  const [idTicket, setIdTicket] = useState(Store.get('idTicket' || null)); /*TODO: change 1 to null and the order*/
+  const [numberTicket, setNumberTicket] = useState(Store.get('numberTicket')||null); /*TODO: change 1 to null and the order*/
 
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
@@ -23,7 +23,7 @@ function NextClientWindow(props) {
    useEffect(() => {
     if (!idTicket) { //if the id ticket is null, so the officer is not serving any client, verify if a new client is arrived
         const timeId = setTimeout(() => {
-           callNextClient(props.counter.id,idTicket);
+           callNextClient(props.counter.id,idTicket );
         }, 10000)
         return () => {
             clearTimeout(timeId)
@@ -47,7 +47,7 @@ function NextClientWindow(props) {
    api_callNextClient(props.counter.id, idTicket).then((nextTicked)=>{
       setIdTicket(nextTicked.ticketId);
       setNumberTicket(nextTicked.ticketNumber);
-      saveTicket(nextTicked.ticketId);
+      saveTicket(nextTicked.ticketId, nextTicked.ticketNumber);
    }).catch((err)=>{
       handleErrors("There is no client to serve");
       setIdTicket(null);
@@ -56,11 +56,13 @@ function NextClientWindow(props) {
   };
 
   
-  const saveTicket = (id) => {
+  const saveTicket = (id, number) => {
     if (!id) {
       Store.set('idTicket', id);
+      Store.set('numberTicket', number);
     } else {
       Store.remove('idTicket');
+      Store.remove('numberTicket');
     }
   };
 

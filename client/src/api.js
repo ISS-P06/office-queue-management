@@ -287,7 +287,6 @@ export const api_callNextClient = async (idCounter, idTicketServed) => {
       idTicketServed: idTicketServed,
     });
     if (res.data) {
-      console.log(res.data);
       return res.data;
     } else {
       throw new Error('There is no ticket to serve currently');

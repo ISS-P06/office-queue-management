@@ -50,7 +50,6 @@ function App() {
         try{
           if(info.role==="officer"){
             const officerCounter = await api_getOfficerCounterNumber(info.id);
-            console.log(officerCounter);
             setCounter(officerCounter);
           }
         }

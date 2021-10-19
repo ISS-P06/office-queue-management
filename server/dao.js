@@ -237,8 +237,8 @@ export function callNextClient(idCounter, idTicketServed) {
   return new Promise((resolve, reject) => {
     if (idTicketServed) {
       //set the previous ticket as served
-      const sql = `UPDATE ticket SET status="served" WHERE id=?`;
-      db.run(sql, [idTicketServed], function (err) {
+      const sql = `UPDATE ticket SET status="served", ref_counter=? WHERE id=?`;
+      db.run(sql, [idCounter, idTicketServed], function (err) {
         if (err) {
           console.log(err);
           reject(err);

@@ -401,7 +401,6 @@ app.post(
 
 // Route used to get the current queue status
 app.get('/api/officer/:id/counter', (req, res) => {
-  console.log("query");
   getOfficerCounter(req.params.id)
     .then((counter) => {console.log(counter); res.json(counter)})
     .catch(() => res.status(500).end());
