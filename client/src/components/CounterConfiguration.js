@@ -71,6 +71,7 @@ const CounterForm = (props) => {
 
     if (services.length == 0) {
       setValidated(true);
+      return;
     }
 
     // check if form is valid using HTML constraints
@@ -132,6 +133,7 @@ const CounterForm = (props) => {
               name="password"
               value={password}
               onChange={(ev) => setPassword(ev.target.value)}
+              minLength="8"
               required
               autoFocus
             />
