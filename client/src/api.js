@@ -300,14 +300,25 @@ export const api_callNextClient = async (idCounter, idTicketServed) => {
   }
 };
 
-export const apiInsertTicket = async (serviceID) => {
-  await fetch('api/insert-selected-ticket', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ serviceID: serviceID }),
-  });
+export const api_insertTicket = async (serviceID) => {
+  try {
+    const res = await fetch('api/insert-selected-ticket', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ serviceID: serviceID }),
+    });
+
+    const data = await res.json();
+    if (data) {
+      return data;
+    } else {
+      throw data.error;
+    }
+  } catch (err) {
+    throw new Error('Error: could not insert new ticket');
+  }
 };
 
 export const api_getQueueData = async () => {
