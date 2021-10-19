@@ -23,7 +23,7 @@ function Authenticator(props) {
 
   return (
     <div className="main">
-      <Form calssName="LoginForm">
+      <Form className="LoginForm">
         <div>
           <h2>Login</h2>
         </div>
