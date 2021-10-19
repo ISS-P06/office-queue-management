@@ -129,6 +129,8 @@ function QueueStatusTable(props) {
                     {
                         queueDataArray.map((q, i) => {
                             if (q.id >= 0) {
+                                let displayTicket = q.currentTicket && q.counter;
+
                                 return (    
                                     <tr>
                                         <td>{q.name}</td>
@@ -136,18 +138,18 @@ function QueueStatusTable(props) {
                                             q.update?
                                             <>
                                             <td className="blink">
-                                                {q.currentTicket}
+                                                {displayTicket ? q.currentTicket : '-'}
                                             </td>
                                             <td className="blink">
-                                                {q.counter}
+                                                {displayTicket ? q.counter : '-'}
                                             </td>
                                             </>
                                             : 
                                             <>
                                             <td>
-                                                {q.currentTicket}
+                                                {displayTicket ? q.currentTicket : '-'}
                                             </td>  
-                                            <td>{q.counter}</td>
+                                            <td>{displayTicket ? q.counter : '-'}</td>
                                             </>
                                         }
                                         
