@@ -161,10 +161,10 @@ const CounterTable = (props) => {
       <Table responsive striped bordered>
         <thead>
           <tr>
-            <th>Counter name</th>
-            <th>Officer name</th>
-            <th>Services offered</th>
-            <th>Actions</th>
+            <th className="align-middle">Counter name</th>
+            <th className="align-middle">Officer name</th>
+            <th className="align-middle">Services offered</th>
+            <th className="align-middle">Actions</th>
           </tr>
         </thead>
         <tbody>
