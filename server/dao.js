@@ -265,7 +265,7 @@ export function callNextClient(idCounter, idTicketServed) {
         const serviceType = rows[0].id;
 
         //select the next ticket to serve
-        const sql3 = `SELECT Ticket.id as ticketId, Ticket.id as ticketNumber
+        const sql3 = `SELECT Ticket.id as ticketId, Ticket.number as ticketNumber
               FROM Ticket, Service_Type
               WHERE Ticket.ref_service=Service_Type.id AND Ticket.status="in-queue" AND Ticket.ref_service=?
               ORDER BY Ticket.date`;
