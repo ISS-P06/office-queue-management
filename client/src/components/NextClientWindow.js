@@ -13,7 +13,7 @@ function NextClientWindow(props) {
 
   const [alert, setAlert] = useState(false);
   const [message, setMessage] = useState("");
-
+  const [first, setFirst]=useState(1);
   useEffect(() => {
     if (message !== "") {
       setAlert(true);
@@ -21,7 +21,7 @@ function NextClientWindow(props) {
   }, [message]);
 
    useEffect(() => {
-    if (!idTicket) { //if the id ticket is null, so the officer is not serving any client, verify if a new client is arrived
+    if (!idTicket &&!first) { //if the id ticket is null and the officer has already served someone, so the officer is not serving any client, verify if a new client is arrived
         const timeId = setTimeout(() => {
            callNextClient(props.counter.id,idTicket );
         }, 10000)
@@ -48,6 +48,7 @@ function NextClientWindow(props) {
       setIdTicket(nextTicked.ticketId);
       setNumberTicket(nextTicked.ticketNumber);
       saveTicket(nextTicked.ticketId, nextTicked.ticketNumber);
+      setFirst(0);
    }).catch((err)=>{
       handleErrors("There is no client to serve");
       setIdTicket(null);
