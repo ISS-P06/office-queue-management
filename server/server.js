@@ -78,6 +78,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static("../client/build"));
 
 /* Node-cron setup
    Reset the ticket at midnight, every day
