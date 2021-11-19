@@ -2,7 +2,6 @@ version: "3"
 
 services:
   frontend:
-    container_name: client
     build:
       context: ./client/
     restart: always
@@ -14,7 +13,6 @@ services:
       - backend:server
 
   backend:
-    container_name: server
     build:
       context: ./server/
     restart: always
