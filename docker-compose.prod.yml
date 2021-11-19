@@ -10,7 +10,7 @@ services:
     ports:
       - 80:80
     depends_on:
-      - api
+      - server
     environment:
       NODE_ENV: production
 
